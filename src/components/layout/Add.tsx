@@ -1,8 +1,8 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+// import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+// import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { Bell, Settings, ChevronRight } from 'lucide-react'
-import { ResponsiveTestCard } from '@/components/debug/ResponsiveTestCard'
+// import { Bell, Settings, ChevronRight } from 'lucide-react'
+// import { ResponsiveTestCard } from '@/components/debug/ResponsiveTestCard'
 
 import background from '@/assets/background/boutique.png'
 
