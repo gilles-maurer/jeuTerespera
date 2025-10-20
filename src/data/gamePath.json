@@ -1,0 +1,9 @@
+{
+  "maxSteps": 40,
+  "currentStep": 0,
+  "pathConfig": {
+    "nodeSize": 50,
+    "spacing": 20,
+    "nodesPerRow": 5
+  }
+}
