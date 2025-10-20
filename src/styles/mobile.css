@@ -1,0 +1,45 @@
+/* Styles spécifiques pour mobile */
+
+/* Support pour safe area (encoche iPhone, etc.) */
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Amélioration des performances de scroll */
+.scroll-smooth {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Optimisation du viewport mobile */
+@media (max-width: 768px) {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  body {
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* États actifs pour mobile */
+.mobile-touch:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+/* Amélioration du contraste pour petits écrans */
+@media (max-width: 640px) {
+  .text-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+  
+  .text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+}

@@ -1,0 +1,88 @@
+          {/* Carte de bienvenue */}
+          <Card className="bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0">
+            <CardHeader>
+              <CardTitle className="text-white">Bienvenue !</CardTitle>
+              <CardDescription className="text-blue-100">
+                Votre application mobile est prête
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="secondary" size="sm">
+                Commencer
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Section des actions rapides */}
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">Actions rapides</h2>
+            <div className="grid grid-cols-2 gap-3">
+              <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                <CardContent className="p-4 text-center">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <span className="text-2xl">📊</span>
+                  </div>
+                  <p className="text-sm font-medium text-gray-900">Statistiques</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                <CardContent className="p-4 text-center">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <span className="text-2xl">💰</span>
+                  </div>
+                  <p className="text-sm font-medium text-gray-900">Finances</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                <CardContent className="p-4 text-center">
+                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <span className="text-2xl">📅</span>
+                  </div>
+                  <p className="text-sm font-medium text-gray-900">Agenda</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                <CardContent className="p-4 text-center">
+                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <span className="text-2xl">⚙️</span>
+                  </div>
+                  <p className="text-sm font-medium text-gray-900">Outils</p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Section des éléments récents */}
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">Récent</h2>
+            <div className="space-y-2">
+              {[1, 2, 3, 4].map((item) => (
+                <Card key={item} className="cursor-pointer hover:shadow-sm transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                          <span className="text-lg">📄</span>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            Élément {item}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            Il y a {item} jour{item > 1 ? 's' : ''}
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-gray-400" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          {/* Debug card pour tester la responsivité */}
+          <ResponsiveTestCard />
