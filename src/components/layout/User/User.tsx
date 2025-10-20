@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
@@ -21,7 +20,6 @@ interface UserProps {
 export function User({ className }: UserProps) {
   const characters: Character[] = charactersData.characters
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [selectedCharacter, setSelectedCharacter] = useState<string | null>(null)
 
   const currentCharacter = characters[currentIndex]
 
@@ -39,7 +37,6 @@ export function User({ className }: UserProps) {
 
   const changeCharacter = (index: number) => {
     const newCharacter = characters[index];
-    setSelectedCharacter(newCharacter.id);
     // Ici vous pouvez sauvegarder le choix dans le localStorage ou un état global
     localStorage.setItem('selectedCharacter', newCharacter.id);
   }

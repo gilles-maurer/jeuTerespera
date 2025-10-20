@@ -14,12 +14,12 @@ interface MainContentProps {
 
 export function MainContent({ activeTab, className }: MainContentProps) {
   return (
-    <div className={cn("h-full flex flex-col bg-gray-50", className)}>
+    <div className={cn("h-full flex flex-col bg-gray-50 overflow-hidden", className)}>
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">The Esmarirran Show</h1>
+            <h1 className="text-xl font-bold text-gray-900">The Terespera Game</h1>
             <p className="text-sm text-gray-500">By Bibule</p>
           </div>
           {/* <div className="flex items-center gap-2">
@@ -33,10 +33,12 @@ export function MainContent({ activeTab, className }: MainContentProps) {
         </div>
       </header>
 
-      {/* Contenu scrollable */}
-      {activeTab === 'home' && <Game/>}
-      {activeTab === 'user' && <User/>}
-      {activeTab === 'add' && <Add/>}
+      {/* Contenu scrollable - prend l'espace restant */}
+      <div className="flex-1 overflow-hidden">
+        {activeTab === 'home' && <Game/>}
+        {activeTab === 'user' && <User/>}
+        {activeTab === 'add' && <Add/>}
+      </div>
     </div>
   )
 }

@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import { MobileLayout, BottomNavigation, MainContent } from '@/components/layout'
-import { Home, Plus, User } from 'lucide-react'
+import { Swords, Star, User } from 'lucide-react'
 
 function App() {
-  const [activeTab, setActiveTab] = useState('home')
+  const [activeTab, setActiveTab] = useState('user')
 
   const navigationItems = [
     {
       id: 'user',
-      label: 'Mon profil',
+      label: 'Choix du personnage',
       icon: <User className="h-5 w-5" />,
       active: activeTab === 'user',
       onClick: () => setActiveTab('user')
@@ -16,7 +16,7 @@ function App() {
     {
       id: 'home',
       label: 'Accueil',
-      icon: <Home className="h-5 w-5" />,
+      icon: <Swords className="h-5 w-5" />,
       active: activeTab === 'home',
       onClick: () => setActiveTab('home')
     },
@@ -24,7 +24,7 @@ function App() {
     {
       id: 'add',
       label: 'Ajouter',
-      icon: <Plus className="h-5 w-5" />,
+      icon: <Star className="h-5 w-5" />,
       active: activeTab === 'add',
       onClick: () => setActiveTab('add')
     },

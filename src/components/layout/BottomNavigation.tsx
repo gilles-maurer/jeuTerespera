@@ -75,7 +75,7 @@ export function BottomNavigation({ items = defaultItems, className }: BottomNavi
             "text-xs font-medium transition-colors",
             item.active ? "text-primary" : "text-gray-600"
           )}>
-            {item.label}
+            {/* {item.label} */}
           </span>
         </Button>
       ))}
