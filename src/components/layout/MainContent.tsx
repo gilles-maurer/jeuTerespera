@@ -19,7 +19,7 @@ export function MainContent({ activeTab, className }: MainContentProps) {
       <header className="bg-white border-b border-gray-200 px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">The Esmariran Show</h1>
+            <h1 className="text-xl font-bold text-gray-900">The Esmarirran Show</h1>
             <p className="text-sm text-gray-500">By Bibule</p>
           </div>
           {/* <div className="flex items-center gap-2">

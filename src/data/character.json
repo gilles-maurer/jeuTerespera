@@ -1,0 +1,16 @@
+{
+  "characters": [
+    {
+      "id": "bibule",
+      "name": "Bibule",
+      "description": "Un troubadour jongleur",
+      "image": "bibule.png"
+    },
+    {
+      "id": "abaiete",
+      "name": "Abaiete",
+      "description": "Une troubadour chanteuse",
+      "image": "abaiete.png"
+    }
+  ]
+}
