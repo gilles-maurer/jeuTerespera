@@ -1,4 +1,3 @@
-import { PathNode } from './PathNode'
 import { cn } from '@/lib/utils'
 
 interface GamePathProps {
@@ -10,6 +9,38 @@ interface GamePathProps {
 
 export function GamePath({ maxSteps, currentStep, characterImage, className }: GamePathProps) {
   const progressPercentage = ((currentStep + 1) / maxSteps) * 100
+
+  // Calculer les cases à afficher (2 avant, actuelle, 2 après)
+  const visibleSteps = []
+  for (let i = -2; i <= 2; i++) {
+    const stepIndex = currentStep + i
+    if (stepIndex >= 0 && stepIndex < maxSteps) {
+      visibleSteps.push({
+        index: stepIndex,
+        position: i,
+        number: stepIndex + 1
+      })
+    }
+  }
+
+  // Fonction pour calculer la position d'une case sur l'arc
+  const getArcPosition = (position: number) => {
+    const radius = 180 // Rayon de l'arc en pixels
+    const angleSpacing = 35 // Espacement entre les cases en degrés
+    const angle = position * angleSpacing
+    const angleRad = (angle * Math.PI) / 180
+
+    // Position X et Y sur l'arc
+    const x = Math.sin(angleRad) * radius
+    const y = -Math.cos(angleRad) * radius + radius * 0.6 // Décalage vers le haut
+
+    // Scale et opacity basés sur la distance au centre
+    const distance = Math.abs(position)
+    const scale = Math.max(0.6, 1 - distance * 0.15)
+    const opacity = Math.max(0.4, 1 - distance * 0.2)
+    
+    return { x, y, scale, opacity, angle }
+  }
 
   return (
     <div className={cn("relative w-full h-full flex flex-col items-center justify-between p-4 pb-2 overflow-hidden", className)}>
@@ -76,88 +107,145 @@ export function GamePath({ maxSteps, currentStep, characterImage, className }: G
         </div>
       </div>
 
-      {/* ZONE PRINCIPALE - Case actuelle en GRAND avec personnage */}
-      <div className="flex-1 flex items-center justify-center w-full max-w-md relative py-4">
-        <div className="relative">
-          {/* Effet de lumière autour du personnage */}
-          <div className="absolute inset-0 bg-gradient-to-b from-blue-400/20 via-purple-500/20 to-pink-500/20 rounded-full blur-3xl animate-pulse"></div>
+      {/* ZONE PRINCIPALE - Arc de cercle avec cases et personnage au centre */}
+      <div className="flex-1 flex items-center justify-center w-full relative py-8">
+        <div className="relative w-full max-w-md h-[400px]" style={{ perspective: '1000px' }}>
           
-          {/* Case actuelle ÉNORME */}
-          <div className="relative">
-            {/* Anneaux d'énergie autour */}
-            <div className="absolute inset-0 -m-8">
-              <div className="absolute inset-0 border-2 border-blue-400/30 rounded-full animate-ping"></div>
-              <div className="absolute inset-0 border-2 border-purple-400/30 rounded-full animate-ping" style={{ animationDelay: '0.3s' }}></div>
-            </div>
-
-            {/* Plateforme de la case actuelle */}
-            <div className="relative bg-gradient-to-br from-blue-500/40 to-purple-600/40 backdrop-blur-xl rounded-3xl p-6 md:p-8 border-4 border-white/50 shadow-2xl">
-              <div className="absolute inset-0 bg-white/10 rounded-3xl animate-pulse"></div>
+          {/* Cases en arc de cercle */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            {visibleSteps.map((step) => {
+              const { x, y, scale, opacity } = getArcPosition(step.position)
+              const isCurrent = step.position === 0
+              const isPast = step.position < 0
+              const isFuture = step.position > 0
               
-              {/* Numéro de case */}
-              <div className="absolute -top-4 -right-4 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center border-4 border-white shadow-xl">
-                <span className="text-white font-black text-lg md:text-xl">{currentStep + 1}</span>
-              </div>
-
-              {/* Personnage */}
-              {characterImage ? (
-                <div className="relative z-10 w-32 h-32 md:w-48 md:h-48 flex items-center justify-center">
-                  <img
-                    src={characterImage}
-                    alt="Character"
-                    className="max-h-full max-w-full object-contain drop-shadow-2xl"
+              return (
+                <div
+                  key={`step-${step.index}`}
+                  className="absolute ease-in-out"
+                  style={{
+                    transform: `translate(${x}px, ${y}px) scale(${scale}) rotateX(60deg)`,
+                    opacity,
+                    zIndex: isCurrent ? 20 : 10 - Math.abs(step.position),
+                    transition: 'all 0.7s cubic-bezier(0.4, 0, 0.2, 1)'
+                  }}
+                >
+                  {/* Case ovale (ellipse pour simuler la profondeur) */}
+                  <div
+                    className={cn(
+                      "relative w-28 h-20 rounded-[50%] border-4 backdrop-blur-sm shadow-2xl",
+                      isCurrent && "border-yellow-400 bg-gradient-to-br from-yellow-400/50 to-orange-500/50 shadow-yellow-400/50",
+                      isPast && "border-green-400/60 bg-gradient-to-br from-green-400/30 to-blue-500/30 shadow-green-400/30",
+                      isFuture && "border-purple-400/60 bg-gradient-to-br from-purple-500/30 to-pink-500/30 shadow-purple-400/30"
+                    )}
                     style={{
-                      filter: 'drop-shadow(0 0 20px rgba(59, 130, 246, 0.5))',
-                      animation: 'float 3s ease-in-out infinite'
+                      transition: 'all 0.5s ease-in-out'
                     }}
-                  />
-                </div>
-              ) : (
-                <div className="w-32 h-32 md:w-48 md:h-48 flex items-center justify-center">
-                  <div className="text-4xl md:text-6xl">👤</div>
-                </div>
-              )}
+                  >
+                    {/* Effet de brillance */}
+                    <div className="absolute inset-0 bg-white/20 rounded-[50%]"></div>
+                    
+                    {/* Badge avec le numéro (au-dessus de la case) */}
+                    <div 
+                      className="absolute -top-8 left-1/2 -translate-x-1/2 z-10"
+                      style={{
+                        transition: 'all 0.5s ease-in-out'
+                      }}
+                    >
+                      <div
+                        className={cn(
+                          "w-12 h-12 rounded-full flex items-center justify-center border-3 shadow-lg",
+                          isCurrent && "bg-gradient-to-br from-yellow-400 to-orange-500 border-white scale-125 animate-pulse",
+                          isPast && "bg-gradient-to-br from-green-400 to-green-600 border-white/80",
+                          isFuture && "bg-gradient-to-br from-purple-500 to-pink-500 border-white/80"
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            "font-black text-white",
+                            isCurrent ? "text-2xl" : "text-lg"
+                          )}
+                          style={{
+                            textShadow: '0 2px 8px rgba(0, 0, 0, 0.5)',
+                            transition: 'all 0.3s ease-in-out'
+                          }}
+                        >
+                          {step.number}
+                        </span>
+                      </div>
+                    </div>
 
-              {/* Étoiles décoratives */}
-              <div className="absolute top-4 left-4 text-yellow-300 animate-pulse text-lg md:text-xl">✨</div>
-              <div className="absolute bottom-4 right-4 text-yellow-300 animate-pulse text-lg md:text-xl" style={{ animationDelay: '0.5s' }}>✨</div>
-              <div className="absolute top-4 right-12 text-yellow-300 animate-pulse text-lg md:text-xl" style={{ animationDelay: '1s' }}>⭐</div>
+                    {/* Indicateur pour la case actuelle */}
+                    {isCurrent && (
+                      <>
+                        <div className="absolute -inset-2 border-2 border-yellow-300 rounded-[50%] animate-ping"></div>
+                        <div className="absolute -top-14 left-1/2 -translate-x-1/2">
+                          <div className="text-2xl animate-bounce">⭐</div>
+                        </div>
+                      </>
+                    )}
+
+                    {/* Indicateur pour les cases passées */}
+                    {isPast && (
+                      <div className="absolute -top-2 -right-2 bg-green-500 rounded-full w-6 h-6 flex items-center justify-center border-2 border-white">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Personnage au centre */}
+          <div className="absolute inset-0 flex items-center justify-center" style={{ marginTop: '100px' }}>
+            <div className="relative z-30">
+              {/* Effet de lumière */}
+              <div className="absolute inset-0 -m-8 bg-gradient-to-b from-blue-400/30 via-purple-500/30 to-pink-500/30 rounded-full blur-2xl animate-pulse"></div>
+              
+              {/* Personnage */}
+              <div className="relative">
+                {characterImage ? (
+                  <div className="relative z-10 w-32 h-32 flex items-center justify-center">
+                    <img
+                      src={characterImage}
+                      alt="Character"
+                      className="max-h-full max-w-full object-contain drop-shadow-2xl"
+                      style={{
+                        filter: 'drop-shadow(0 0 20px rgba(59, 130, 246, 0.8))',
+                        animation: 'float 3s ease-in-out infinite'
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="w-32 h-32 flex items-center justify-center">
+                    <div className="text-6xl" style={{ animation: 'float 3s ease-in-out infinite' }}>👤</div>
+                  </div>
+                )}
+
+                {/* Plateforme sous le personnage */}
+                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-20 h-8 bg-white/20 rounded-[50%] blur-sm"></div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* APERÇU - Prochaine case (si pas à la fin) */}
-      {currentStep < maxSteps - 1 && (
-        <div className="w-full max-w-md mb-16">
-          <div className="bg-white/5 backdrop-blur-md rounded-xl p-3 border border-white/20 flex items-center gap-3">
-            <div className="flex-shrink-0">
-              <div className="relative">
-                <PathNode nodeNumber={currentStep + 2} state="future" />
-                <div className="absolute -top-1 -right-1 bg-yellow-400 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
-                  ➜
-                </div>
-              </div>
-            </div>
-            <div className="flex-1">
-              <p className="text-white/60 text-xs">Prochaine étape</p>
-              <p className="text-white font-bold">Case {currentStep + 2}</p>
-            </div>
-            <div className="text-2xl">🎯</div>
-          </div>
-        </div>
-      )}
-
-      {/* Message de fin */}
-      {currentStep === maxSteps - 1 && (
-        <div className="w-full max-w-md mb-16">
+      {/* Message de fin ou prochaine étape */}
+      <div className="w-full max-w-md mb-16">
+        {currentStep === maxSteps - 1 ? (
           <div className="bg-gradient-to-r from-yellow-400/30 to-orange-500/30 backdrop-blur-md rounded-xl p-4 border-2 border-yellow-400/50 animate-pulse">
             <p className="text-white font-bold text-center text-lg flex items-center justify-center gap-2">
               🏆 Dernière case ! 🏆
             </p>
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="text-center">
+            <p className="text-white/60 text-sm mb-1">Prochaine étape</p>
+            <p className="text-white font-bold text-xl">Case {currentStep + 2}</p>
+          </div>
+        )}
+      </div>
 
       {/* Animation CSS pour le flottement */}
       <style>{`

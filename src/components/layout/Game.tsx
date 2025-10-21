@@ -101,23 +101,32 @@ export function Game({ className }: GameProps) {
       setDiceResult(additionalStep)
       setIsRolling(false)
 
-      // Appliquer le résultat après un court délai pour voir le résultat
+      // Afficher le résultat pendant 1s
       setTimeout(() => {
-        const newStep = currentStep + additionalStep
-        const finalStep = Math.min(newStep, maxSteps - 1)
-        setCurrentStep(finalStep)
-        localStorage.setItem('gameProgress', finalStep.toString())
-        
-        // Déclencher un événement personnalisé pour notifier les autres composants
-        window.dispatchEvent(new Event('localStorageUpdated'))
+        // Fermer le modal IMMÉDIATEMENT
+        setIsModalOpen(false)
+        setDiceResult(null)
+        setActionType(null)
 
-        // Fermer le modal après 1s
-        setTimeout(() => {
-          setIsModalOpen(false)
-          setDiceResult(null)
-          setActionType(null)
-        }, 1000)
-      }, 500)
+        // PUIS animer case par case
+        const targetStep = Math.min(currentStep + additionalStep, maxSteps - 1)
+        let step = currentStep
+        
+        const animateStep = () => {
+          if (step < targetStep) {
+            step++
+            setCurrentStep(step)
+            localStorage.setItem('gameProgress', step.toString())
+            window.dispatchEvent(new Event('localStorageUpdated'))
+            
+            // Délai entre chaque case (700ms pour correspondre à l'animation CSS)
+            setTimeout(animateStep, 700)
+          }
+        }
+        
+        // Démarrer l'animation après un court délai
+        setTimeout(animateStep, 200)
+      }, 1000)
     }, 1200)
   }
 
