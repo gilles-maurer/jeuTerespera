@@ -35,9 +35,15 @@ export function MainContent({ activeTab, className }: MainContentProps) {
 
       {/* Contenu scrollable - prend l'espace restant */}
       <div className="flex-1 overflow-hidden">
-        {activeTab === 'home' && <Game/>}
-        {activeTab === 'user' && <User/>}
-        {activeTab === 'add' && <Add/>}
+        <div className={cn("h-full", activeTab !== 'home' && "hidden")}>
+          <Game/>
+        </div>
+        <div className={cn("h-full", activeTab !== 'user' && "hidden")}>
+          <User/>
+        </div>
+        <div className={cn("h-full", activeTab !== 'add' && "hidden")}>
+          <Add/>
+        </div>
       </div>
     </div>
   )

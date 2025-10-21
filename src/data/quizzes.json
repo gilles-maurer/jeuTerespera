@@ -1,0 +1,37 @@
+[
+  {
+    "id": "quiz1",
+    "title": "La légende de Terespera",
+    "bonusSteps": 3,
+    "text": "Il était une fois dans le royaume de {0}, un brave héros nommé {1} qui devait affronter {2} pour sauver la princesse.",
+    "questions": [
+      {
+        "id": 0,
+        "type": "select",
+        "options": [
+          { "text": "Terespera", "correct": true },
+          { "text": "Mordor", "correct": false },
+          { "text": "Narnia", "correct": false }
+        ]
+      },
+      {
+        "id": 1,
+        "type": "select",
+        "options": [
+          { "text": "Bibule", "correct": true },
+          { "text": "Gandalf", "correct": false },
+          { "text": "Harry", "correct": false }
+        ]
+      },
+      {
+        "id": 2,
+        "type": "select",
+        "options": [
+          { "text": "le dragon", "correct": true },
+          { "text": "le méchant sorcier", "correct": false },
+          { "text": "une armée d'orcs", "correct": false }
+        ]
+      }
+    ]
+  }
+]
