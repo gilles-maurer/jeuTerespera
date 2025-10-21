@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useState, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, Crown, RotateCcw, Skull } from 'lucide-react'
+import { Crown, RotateCcw, Skull } from 'lucide-react'
 // import { ResponsiveTestCard } from '@/components/debug/ResponsiveTestCard'
 
 import background from '@/assets/background/village.png'
@@ -42,21 +42,21 @@ export function Game({ className }: GameProps) {
     }
   }, [])
 
-  const handleNextStep = () => {
-    if (currentStep < gamePathData.maxSteps - 1) {
-      const newStep = currentStep + 1
-      setCurrentStep(newStep)
-      localStorage.setItem('gameProgress', newStep.toString())
-    }
-  }
+  // const handleNextStep = () => {
+  //   if (currentStep < gamePathData.maxSteps - 1) {
+  //     const newStep = currentStep + 1
+  //     setCurrentStep(newStep)
+  //     localStorage.setItem('gameProgress', newStep.toString())
+  //   }
+  // }
 
-  const handlePrevStep = () => {
-    if (currentStep > 0) {
-      const newStep = currentStep - 1
-      setCurrentStep(newStep)
-      localStorage.setItem('gameProgress', newStep.toString())
-    }
-  }
+  // const handlePrevStep = () => {
+  //   if (currentStep > 0) {
+  //     const newStep = currentStep - 1
+  //     setCurrentStep(newStep)
+  //     localStorage.setItem('gameProgress', newStep.toString())
+  //   }
+  // }
 
   const handleReset = () => {
     setCurrentStep(0)

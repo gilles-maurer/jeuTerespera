@@ -9,7 +9,7 @@ interface MobileLayoutProps {
 
 export function MobileLayout({ children, navigation, className }: MobileLayoutProps) {
   return (
-    <div className={cn("flex flex-col h-screen w-full overflow-hidden", className)}>
+    <div className={cn("flex flex-col w-full overflow-hidden", className)} style={{ height: '100dvh' }}>
       {/* Contenu principal - prend tout l'espace disponible */}
       <main className="flex-1 overflow-hidden">
         {children}

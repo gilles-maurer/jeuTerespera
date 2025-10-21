@@ -33,6 +33,7 @@ function App() {
   return (
     <MobileLayout
       navigation={<BottomNavigation items={navigationItems} />}
+      className="h-full"
     >
       <MainContent activeTab={activeTab} />
     </MobileLayout>
