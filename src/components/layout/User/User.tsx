@@ -21,7 +21,8 @@ export function User({ className }: UserProps) {
   const characters: Character[] = charactersData.characters
   const [currentIndex, setCurrentIndex] = useState(0)
 
-  const currentCharacter = characters[currentIndex]
+  const currentCharacter = characters[currentIndex];
+  localStorage.setItem('selectedCharacter', currentCharacter.id);
 
   const nextCharacter = () => {
     const newIndex = (currentIndex + 1) % characters.length;

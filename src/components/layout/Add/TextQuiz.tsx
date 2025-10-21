@@ -24,27 +24,67 @@ interface Quiz {
   questions: QuizQuestion[]
 }
 
-export function TextQuiz() {
-  const [quiz] = useState<Quiz>(quizzesData[0])
+interface TextQuizProps {
+  quizIndex?: number
+}
+
+// Fonction pour mélanger un tableau (Fisher-Yates shuffle)
+const shuffleArray = <T,>(array: T[]): T[] => {
+  const shuffled = [...array]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled
+}
+
+export function TextQuiz({ quizIndex = 0 }: TextQuizProps) {
+  // IMPORTANT: Mettre quiz dans le state pour qu'il se mette à jour quand quizIndex change
+  const [quiz, setQuiz] = useState<Quiz>(() => {
+    // Mélanger les options dès l'initialisation
+    const originalQuiz = quizzesData[quizIndex]
+    return {
+      ...originalQuiz,
+      questions: originalQuiz.questions.map(q => ({
+        ...q,
+        options: shuffleArray(q.options)
+      }))
+    }
+  })
   const [answers, setAnswers] = useState<{ [key: number]: string }>({})
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
-  const [lives, setLives] = useState(() => {
-    // Récupérer les vies depuis localStorage
-    const storedLives = localStorage.getItem(`quiz_${quiz.id}_lives`)
-    return storedLives ? parseInt(storedLives, 10) : 3
-  })
-  const [hasWon, setHasWon] = useState(() => {
-    // Vérifier si le quiz a déjà été gagné
-    const storedWon = localStorage.getItem(`quiz_${quiz.id}_won`)
-    return storedWon === 'true'
-  })
+  const [lives, setLives] = useState(3)
+  const [hasWon, setHasWon] = useState(false)
   const [isAdminMode, setIsAdminMode] = useState(() => {
     // Récupérer le mode admin depuis localStorage
     const storedAdminMode = localStorage.getItem('isAdminMode')
     return storedAdminMode === 'true'
   })
+
+  // Réinitialiser TOUT le quiz quand l'index change
+  useEffect(() => {
+    const originalQuiz = quizzesData[quizIndex]
+    // Mélanger les options à chaque changement de quiz
+    const shuffledQuiz = {
+      ...originalQuiz,
+      questions: originalQuiz.questions.map(q => ({
+        ...q,
+        options: shuffleArray(q.options)
+      }))
+    }
+    setQuiz(shuffledQuiz)
+    setAnswers({})
+    setIsSubmitted(false)
+    setIsCorrect(false)
+    
+    const storedLives = localStorage.getItem(`quiz_${originalQuiz.id}_lives`)
+    setLives(storedLives ? parseInt(storedLives, 10) : 3)
+    
+    const storedWon = localStorage.getItem(`quiz_${originalQuiz.id}_won`)
+    setHasWon(storedWon === 'true')
+  }, [quizIndex])
 
   useEffect(() => {
     // Récupérer la position actuelle
@@ -87,13 +127,25 @@ export function TextQuiz() {
     setIsSubmitted(true)
 
     if (allCorrect) {
+      // Récupérer la position ACTUELLE depuis localStorage
+      const storedProgress = localStorage.getItem('gameProgress')
+      const actualCurrentStep = storedProgress ? parseInt(storedProgress, 10) : 0
+      
+      // Récupérer le nombre d'étapes ACTUEL depuis localStorage
+      const storedMaxSteps = localStorage.getItem('gameMaxSteps')
+      const actualMaxSteps = storedMaxSteps ? parseInt(storedMaxSteps, 10) : gamePathData.maxSteps
+      
       // Ajouter les cases bonus
-      const newStep = Math.min(currentStep + quiz.bonusSteps, gamePathData.maxSteps - 1)
+      const newStep = Math.min(actualCurrentStep + quiz.bonusSteps, actualMaxSteps - 1)
       localStorage.setItem('gameProgress', newStep.toString())
       setCurrentStep(newStep)
+      
       // Marquer le quiz comme gagné
       setHasWon(true)
       localStorage.setItem(`quiz_${quiz.id}_won`, 'true')
+      
+      // Déclencher un événement personnalisé pour notifier les autres composants
+      window.dispatchEvent(new Event('localStorageUpdated'))
     } else {
       // Retirer une vie en cas d'échec
       const newLives = lives - 1
@@ -106,6 +158,16 @@ export function TextQuiz() {
     setAnswers({})
     setIsSubmitted(false)
     setIsCorrect(false)
+    
+    // Mélanger à nouveau les options
+    const shuffledQuiz = {
+      ...quiz,
+      questions: quiz.questions.map(q => ({
+        ...q,
+        options: shuffleArray(q.options)
+      }))
+    }
+    setQuiz(shuffledQuiz)
   }
 
   const handleResetLives = () => {
@@ -113,6 +175,20 @@ export function TextQuiz() {
     setHasWon(false)
     localStorage.setItem(`quiz_${quiz.id}_lives`, '3')
     localStorage.removeItem(`quiz_${quiz.id}_won`)
+    setAnswers({})
+    setIsSubmitted(false)
+    setIsCorrect(false)
+    
+    // Mélanger à nouveau les options
+    const originalQuiz = quizzesData[quizIndex]
+    const shuffledQuiz = {
+      ...originalQuiz,
+      questions: originalQuiz.questions.map(q => ({
+        ...q,
+        options: shuffleArray(q.options)
+      }))
+    }
+    setQuiz(shuffledQuiz)
   }
 
   // Fonction pour rendre le texte avec les select boxes

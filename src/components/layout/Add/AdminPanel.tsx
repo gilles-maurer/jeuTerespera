@@ -63,6 +63,29 @@ export function AdminPanel() {
               </p>
             </div>
           )}
+
+          {/* Liste des codes */}
+          <div className="bg-white/10 rounded-lg p-4 border border-white/30">
+            <h3 className="text-white font-semibold mb-3 text-center">📝 Codes disponibles</h3>
+            <div className="space-y-2">
+              <div className="bg-black/20 rounded p-2">
+                <p className="text-white font-mono text-sm">admin12*</p>
+                <p className="text-white/60 text-xs">Ouvre ce panneau admin</p>
+              </div>
+              <div className="bg-black/20 rounded p-2">
+                <p className="text-white font-mono text-sm">position99</p>
+                <p className="text-white/60 text-xs">Modifier la position et le nombre d'étapes</p>
+              </div>
+              <div className="bg-black/20 rounded p-2">
+                <p className="text-white font-mono text-sm">quiz777</p>
+                <p className="text-white/60 text-xs">Quiz 1 - La légende de Terespera (+3 cases)</p>
+              </div>
+              <div className="bg-black/20 rounded p-2">
+                <p className="text-white font-mono text-sm">quiz888</p>
+                <p className="text-white/60 text-xs">Quiz 2 - L'aventure continue (+5 cases)</p>
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useState, useEffect } from 'react'
-import { Crown, RotateCcw, Skull } from 'lucide-react'
+import { Crown, Skull, Dices, X } from 'lucide-react'
 // import { ResponsiveTestCard } from '@/components/debug/ResponsiveTestCard'
 
 import background from '@/assets/background/village.png'
@@ -24,6 +24,11 @@ interface GameProps {
 export function Game({ className }: GameProps) {
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null)
   const [currentStep, setCurrentStep] = useState(0)
+  const [maxSteps, setMaxSteps] = useState(gamePathData.maxSteps)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isRolling, setIsRolling] = useState(false)
+  const [diceResult, setDiceResult] = useState<number | null>(null)
+  const [actionType, setActionType] = useState<'win' | 'lose' | null>(null)
 
   useEffect(() => {
     // Récupérer le personnage sélectionné depuis le localStorage
@@ -40,43 +45,80 @@ export function Game({ className }: GameProps) {
     if (storedProgress) {
       setCurrentStep(parseInt(storedProgress, 10))
     }
+
+    // Récupérer le nombre d'étapes
+    const storedMaxSteps = localStorage.getItem('gameMaxSteps')
+    if (storedMaxSteps) {
+      setMaxSteps(parseInt(storedMaxSteps, 10))
+    }
+
+    // Écouter les changements de localStorage
+    const handleStorageChange = () => {
+      const progress = localStorage.getItem('gameProgress')
+      if (progress !== null) {
+        const newStep = parseInt(progress, 10)
+        setCurrentStep(newStep)
+      }
+      
+      const max = localStorage.getItem('gameMaxSteps')
+      if (max !== null) {
+        const newMax = parseInt(max, 10)
+        setMaxSteps(newMax)
+      }
+    }
+
+    // Événement personnalisé pour les changements dans le même onglet
+    const handleCustomStorageChange = () => {
+      handleStorageChange()
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    window.addEventListener('localStorageUpdated', handleCustomStorageChange)
+    
+    // Polling de secours toutes les 500ms
+    const interval = setInterval(() => {
+      handleStorageChange()
+    }, 500)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('localStorageUpdated', handleCustomStorageChange)
+      clearInterval(interval)
+    }
   }, [])
 
-  // const handleNextStep = () => {
-  //   if (currentStep < gamePathData.maxSteps - 1) {
-  //     const newStep = currentStep + 1
-  //     setCurrentStep(newStep)
-  //     localStorage.setItem('gameProgress', newStep.toString())
-  //   }
-  // }
+  const handleDiceRoll = (type: 'win' | 'lose') => {
+    setActionType(type)
+    setIsRolling(true)
+    setDiceResult(null)
 
-  // const handlePrevStep = () => {
-  //   if (currentStep > 0) {
-  //     const newStep = currentStep - 1
-  //     setCurrentStep(newStep)
-  //     localStorage.setItem('gameProgress', newStep.toString())
-  //   }
-  // }
+    // Animation de dés pendant 1.2s
+    setTimeout(() => {
+      const additionalStep = type === 'win' 
+        ? Math.floor(Math.random() * 3) + 4  // 4-6 cases
+        : Math.floor(Math.random() * 3) + 1  // 1-3 cases
+      
+      setDiceResult(additionalStep)
+      setIsRolling(false)
 
-  const handleReset = () => {
-    setCurrentStep(0)
-    localStorage.setItem('gameProgress', '0')
-  }
+      // Appliquer le résultat après un court délai pour voir le résultat
+      setTimeout(() => {
+        const newStep = currentStep + additionalStep
+        const finalStep = Math.min(newStep, maxSteps - 1)
+        setCurrentStep(finalStep)
+        localStorage.setItem('gameProgress', finalStep.toString())
+        
+        // Déclencher un événement personnalisé pour notifier les autres composants
+        window.dispatchEvent(new Event('localStorageUpdated'))
 
-  const handleLoseProgress = () => {
-    const additionalStep = Math.floor(Math.random() * 3) + 1;
-    console.log('additionalStep', additionalStep);
-    const newStep = additionalStep + currentStep;
-    setCurrentStep(Math.min(newStep, gamePathData.maxSteps - 1));
-    localStorage.setItem('gameProgress', (newStep >= 0 ? newStep : 0).toString());
-  }
-
-  const handleWinProgress = () => {
-    const additionalStep = Math.floor(Math.random() * 3) + 4;
-    console.log('additionalStep', additionalStep);
-    const newStep = additionalStep + currentStep;
-    setCurrentStep(Math.min(newStep, gamePathData.maxSteps - 1));
-    localStorage.setItem('gameProgress', (newStep >= 0 ? newStep : 0).toString());
+        // Fermer le modal après 1s
+        setTimeout(() => {
+          setIsModalOpen(false)
+          setDiceResult(null)
+          setActionType(null)
+        }, 1000)
+      }, 500)
+    }, 1200)
   }
 
   return (
@@ -94,55 +136,95 @@ export function Game({ className }: GameProps) {
         {/* Chemin du jeu */}
         <div className="relative z-10 h-full pb-4">
           <GamePath 
-            maxSteps={gamePathData.maxSteps} 
+            maxSteps={maxSteps} 
             currentStep={currentStep}
             characterImage={selectedCharacter ? new URL(`../../assets/characters/${selectedCharacter.image}`, import.meta.url).href : null}
           />
         </div>
 
-        {/* Contrôles de progression - positionnés juste au-dessus de la barre de navigation */}
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 bg-black/20 backdrop-blur-sm rounded-full p-2">
-          {/* <Button
-            onClick={handlePrevStep}
-            disabled={currentStep === 0}
-            className="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 text-white disabled:opacity-30 h-10 w-10"
-            size="icon"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
-
+        {/* Bouton principal du dé */}
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-30">
           <Button
-            onClick={handleNextStep}
-            disabled={currentStep === gamePathData.maxSteps - 1}
-            className="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 text-white disabled:opacity-30 h-10 w-10"
+            onClick={() => setIsModalOpen(true)}
+            className="bg-purple-500/30 hover:bg-purple-500/50 backdrop-blur-md border border-purple-400/50 text-white h-12 w-12"
             size="icon"
           >
-            <ChevronRight className="h-5 w-5" />
-          </Button> */}
-
-          <Button
-            onClick={handleReset}
-            className="bg-red-500/30 hover:bg-red-500/50 backdrop-blur-md border border-red-400/50 text-white h-10 w-10"
-            size="icon"
-          >
-            <RotateCcw className="h-4 w-4" />
-          </Button>
-          <Button
-            onClick={handleLoseProgress}
-            className="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 text-white disabled:opacity-30 h-10 w-10"
-            size="icon"
-          >
-            <Skull className="h-5 w-5" />
-          </Button>
-
-          <Button
-            onClick={handleWinProgress}
-            className="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 text-white disabled:opacity-30 h-10 w-10"
-            size="icon"
-          >
-            <Crown className="h-5 w-5" />
+            <Dices className="h-6 w-6" />
           </Button>
         </div>
+
+        {/* Modal du dé */}
+        {isModalOpen && (
+          <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <div className="relative bg-gradient-to-br from-purple-900/90 to-blue-900/90 backdrop-blur-md rounded-2xl p-8 border-2 border-purple-400/50 max-w-sm w-full mx-4">
+              {/* Bouton fermer */}
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="absolute top-3 right-3 text-white/70 hover:text-white transition-colors"
+              >
+                <X className="h-6 w-6" />
+              </button>
+
+              {/* Titre */}
+              <h2 className="text-2xl font-bold text-white text-center mb-6">
+                Résultat du jeu 🎲
+              </h2>
+
+              {/* Zone d'animation du dé */}
+              {isRolling || diceResult !== null ? (
+                <div className="flex items-center justify-center min-h-[150px] mb-6">
+                  <div className={cn(
+                    "text-8xl font-bold text-white",
+                    isRolling && "animate-dice-roll"
+                  )}>
+                    {isRolling ? (
+                      <span className="inline-block">
+                        {Math.floor(Math.random() * 6) + 1}
+                      </span>
+                    ) : (
+                      <span className="inline-block animate-dice-bounce">
+                        {diceResult}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                /* Boutons de choix */
+                <div className="flex gap-4 justify-center mb-4">
+                  <Button
+                    onClick={() => handleDiceRoll('lose')}
+                    className="bg-red-500/30 hover:bg-red-500/50 backdrop-blur-md border border-red-400/50 text-white h-16 w-16 flex-col gap-1"
+                    size="icon"
+                  >
+                    <Skull className="h-6 w-6" />
+                    <span className="text-xs">1-3</span>
+                  </Button>
+
+                  <Button
+                    onClick={() => handleDiceRoll('win')}
+                    className="bg-green-500/30 hover:bg-green-500/50 backdrop-blur-md border border-green-400/50 text-white h-16 w-16 flex-col gap-1"
+                    size="icon"
+                  >
+                    <Crown className="h-6 w-6" />
+                    <span className="text-xs">4-6</span>
+                  </Button>
+                </div>
+              )}
+
+              {/* Message du résultat */}
+              {diceResult !== null && !isRolling && (
+                <div className={cn(
+                  "text-center text-lg font-semibold animate-fade-in",
+                  actionType === 'win' ? "text-green-300" : "text-red-300"
+                )}>
+                  {actionType === 'win' ? '🎉 Victoire !' : '💪 Continue !'}
+                  <br />
+                  <span className="text-white">+{diceResult} cases</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
     </div>
   )
 }

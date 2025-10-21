@@ -65,3 +65,55 @@
     overflow: hidden;
   }
 }
+
+@layer utilities {
+  /* Animation de rotation du dé */
+  @keyframes dice-roll {
+    0%, 100% {
+      transform: rotateX(0deg) rotateY(0deg) scale(1);
+    }
+    25% {
+      transform: rotateX(180deg) rotateY(90deg) scale(1.1);
+    }
+    50% {
+      transform: rotateX(360deg) rotateY(180deg) scale(1);
+    }
+    75% {
+      transform: rotateX(180deg) rotateY(270deg) scale(1.1);
+    }
+  }
+
+  .animate-dice-roll {
+    animation: dice-roll 0.15s ease-in-out infinite;
+  }
+
+  /* Animation de bounce pour le résultat */
+  @keyframes dice-bounce {
+    0%, 100% {
+      transform: scale(1) translateY(0);
+    }
+    50% {
+      transform: scale(1.2) translateY(-10px);
+    }
+  }
+
+  .animate-dice-bounce {
+    animation: dice-bounce 0.5s ease-out;
+  }
+
+  /* Animation de fade-in */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+  }
+}

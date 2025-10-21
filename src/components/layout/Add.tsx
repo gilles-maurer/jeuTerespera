@@ -13,7 +13,7 @@ interface AddProps {
   className?: string
 }
 
-type ComponentType = 'admin' | 'position' | 'quiz' | null
+type ComponentType = 'admin' | 'position' | 'quiz' | 'quiz2' | null
 
 export function Add({ className }: AddProps) {
   const [code, setCode] = useState('')
@@ -36,7 +36,12 @@ export function Add({ className }: AddProps) {
       setTimeout(() => setMessage(null), 2000)
     } else if (code === 'quiz777') {
       setActiveComponent('quiz')
-      setMessage({ type: 'success', text: '✅ Quiz ouvert' })
+      setMessage({ type: 'success', text: '✅ Quiz 1 ouvert' })
+      setCode('')
+      setTimeout(() => setMessage(null), 2000)
+    } else if (code === 'quiz888') {
+      setActiveComponent('quiz2')
+      setMessage({ type: 'success', text: '✅ Quiz 2 ouvert' })
       setCode('')
       setTimeout(() => setMessage(null), 2000)
     } else {
@@ -53,7 +58,9 @@ export function Add({ className }: AddProps) {
       case 'position':
         return <PositionChanger />
       case 'quiz':
-        return <TextQuiz />
+        return <TextQuiz quizIndex={0} />
+      case 'quiz2':
+        return <TextQuiz quizIndex={1} />
       default:
         return (
           <div className="flex items-center justify-center h-full">

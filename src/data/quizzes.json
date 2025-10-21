@@ -33,5 +33,40 @@
         ]
       }
     ]
+  },
+  {
+    "id": "quiz2",
+    "title": "L'aventure continue",
+    "bonusSteps": 5,
+    "text": "Pour traverser la forêt enchantée, il faut utiliser {0} et éviter les {1}, car seul {2} peut les vaincre.",
+    "questions": [
+      {
+        "id": 0,
+        "type": "select",
+        "options": [
+          { "text": "la carte magique", "correct": true },
+          { "text": "une boussole", "correct": false },
+          { "text": "un GPS", "correct": false }
+        ]
+      },
+      {
+        "id": 1,
+        "type": "select",
+        "options": [
+          { "text": "trolls de pierre", "correct": true },
+          { "text": "zombies", "correct": false },
+          { "text": "loups-garous", "correct": false }
+        ]
+      },
+      {
+        "id": 2,
+        "type": "select",
+        "options": [
+          { "text": "le courage", "correct": true },
+          { "text": "la magie noire", "correct": false },
+          { "text": "une épée laser", "correct": false }
+        ]
+      }
+    ]
   }
 ]
