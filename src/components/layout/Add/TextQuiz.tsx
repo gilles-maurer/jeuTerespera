@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { BookOpen, CheckCircle, XCircle, RefreshCw } from 'lucide-react'
 import quizzesData from '@/data/quizzes.json'
-import gamePathData from '@/data/gamePath.json'
+import { useGameStore } from '@/store/gameStore'
 
 interface QuizOption {
   text: string
@@ -39,6 +39,10 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 }
 
 export function TextQuiz({ quizIndex = 0 }: TextQuizProps) {
+  const currentStepStore = useGameStore(s => s.currentStep)
+  const maxSteps = useGameStore(s => s.maxSteps)
+  const setCurrentStepStore = useGameStore(s => s.setCurrentStep)
+  const isAdminMode = useGameStore(s => s.isAdminMode)
   // IMPORTANT: Mettre quiz dans le state pour qu'il se mette à jour quand quizIndex change
   const [quiz, setQuiz] = useState<Quiz>(() => {
     // Mélanger les options dès l'initialisation
@@ -57,11 +61,6 @@ export function TextQuiz({ quizIndex = 0 }: TextQuizProps) {
   const [currentStep, setCurrentStep] = useState(0)
   const [lives, setLives] = useState(3)
   const [hasWon, setHasWon] = useState(false)
-  const [isAdminMode, setIsAdminMode] = useState(() => {
-    // Récupérer le mode admin depuis localStorage
-    const storedAdminMode = localStorage.getItem('isAdminMode')
-    return storedAdminMode === 'true'
-  })
 
   // Réinitialiser TOUT le quiz quand l'index change
   useEffect(() => {
@@ -87,21 +86,9 @@ export function TextQuiz({ quizIndex = 0 }: TextQuizProps) {
   }, [quizIndex])
 
   useEffect(() => {
-    // Récupérer la position actuelle
-    const storedProgress = localStorage.getItem('gameProgress')
-    if (storedProgress) {
-      setCurrentStep(parseInt(storedProgress, 10))
-    }
-
-    // Écouter les changements du mode admin
-    const handleStorageChange = () => {
-      const storedAdminMode = localStorage.getItem('isAdminMode')
-      setIsAdminMode(storedAdminMode === 'true')
-    }
-
-    window.addEventListener('storage', handleStorageChange)
-    return () => window.removeEventListener('storage', handleStorageChange)
-  }, [])
+    // Sync view of currentStep from store
+    setCurrentStep(currentStepStore)
+  }, [currentStepStore])
 
   const handleAnswerChange = (questionId: number, value: string) => {
     setAnswers(prev => ({
@@ -127,25 +114,14 @@ export function TextQuiz({ quizIndex = 0 }: TextQuizProps) {
     setIsSubmitted(true)
 
     if (allCorrect) {
-      // Récupérer la position ACTUELLE depuis localStorage
-      const storedProgress = localStorage.getItem('gameProgress')
-      const actualCurrentStep = storedProgress ? parseInt(storedProgress, 10) : 0
-      
-      // Récupérer le nombre d'étapes ACTUEL depuis localStorage
-      const storedMaxSteps = localStorage.getItem('gameMaxSteps')
-      const actualMaxSteps = storedMaxSteps ? parseInt(storedMaxSteps, 10) : gamePathData.maxSteps
-      
-      // Ajouter les cases bonus
-      const newStep = Math.min(actualCurrentStep + quiz.bonusSteps, actualMaxSteps - 1)
-      localStorage.setItem('gameProgress', newStep.toString())
+      // Ajouter les cases bonus en s'appuyant sur le store
+      const newStep = Math.min(currentStepStore + quiz.bonusSteps, maxSteps - 1)
+      setCurrentStepStore(newStep)
       setCurrentStep(newStep)
       
       // Marquer le quiz comme gagné
       setHasWon(true)
       localStorage.setItem(`quiz_${quiz.id}_won`, 'true')
-      
-      // Déclencher un événement personnalisé pour notifier les autres composants
-      window.dispatchEvent(new Event('localStorageUpdated'))
     } else {
       // Retirer une vie en cas d'échec
       const newLives = lives - 1

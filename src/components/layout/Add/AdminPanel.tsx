@@ -1,17 +1,14 @@
-import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Shield } from 'lucide-react'
+import { useGameStore } from '@/store/gameStore'
 
 export function AdminPanel() {
-  const [isAdminMode, setIsAdminMode] = useState(() => {
-    return localStorage.getItem('isAdminMode') === 'true'
-  })
+  const isAdminMode = useGameStore(s => s.isAdminMode)
+  const setIsAdminMode = useGameStore(s => s.setIsAdminMode)
 
   const toggleAdminMode = () => {
-    const newValue = !isAdminMode
-    setIsAdminMode(newValue)
-    localStorage.setItem('isAdminMode', newValue.toString())
+    setIsAdminMode(!isAdminMode)
   }
 
   return (

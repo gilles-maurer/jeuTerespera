@@ -1,14 +1,14 @@
 // import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { useState, useEffect } from 'react'
+import { useMemo, useState } from 'react'
 import { Crown, Skull, Dices, X } from 'lucide-react'
 // import { ResponsiveTestCard } from '@/components/debug/ResponsiveTestCard'
 
 import background from '@/assets/background/village.png'
 import charactersData from '@/data/character.json'
-import gamePathData from '@/data/gamePath.json'
 import { GamePath } from './Game/GamePath'
+import { useGameStore } from '@/store/gameStore'
 
 interface Character {
   id: string
@@ -22,70 +22,20 @@ interface GameProps {
 }
 
 export function Game({ className }: GameProps) {
-  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null)
-  const [currentStep, setCurrentStep] = useState(0)
-  const [maxSteps, setMaxSteps] = useState(gamePathData.maxSteps)
+  const selectedCharacterId = useGameStore(s => s.selectedCharacterId)
+  const currentStep = useGameStore(s => s.currentStep)
+  const maxSteps = useGameStore(s => s.maxSteps)
+  const setCurrentStep = useGameStore(s => s.setCurrentStep)
+
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isRolling, setIsRolling] = useState(false)
   const [diceResult, setDiceResult] = useState<number | null>(null)
   const [actionType, setActionType] = useState<'win' | 'lose' | null>(null)
 
-  useEffect(() => {
-    // Récupérer le personnage sélectionné depuis le localStorage
-    const storedCharacterId = localStorage.getItem('selectedCharacter')
-    if (storedCharacterId) {
-      const character = charactersData.characters.find(c => c.id === storedCharacterId)
-      if (character) {
-        setSelectedCharacter(character)
-      }
-    }
-
-    // Récupérer la progression du jeu
-    const storedProgress = localStorage.getItem('gameProgress')
-    if (storedProgress) {
-      setCurrentStep(parseInt(storedProgress, 10))
-    }
-
-    // Récupérer le nombre d'étapes
-    const storedMaxSteps = localStorage.getItem('gameMaxSteps')
-    if (storedMaxSteps) {
-      setMaxSteps(parseInt(storedMaxSteps, 10))
-    }
-
-    // Écouter les changements de localStorage
-    const handleStorageChange = () => {
-      const progress = localStorage.getItem('gameProgress')
-      if (progress !== null) {
-        const newStep = parseInt(progress, 10)
-        setCurrentStep(newStep)
-      }
-      
-      const max = localStorage.getItem('gameMaxSteps')
-      if (max !== null) {
-        const newMax = parseInt(max, 10)
-        setMaxSteps(newMax)
-      }
-    }
-
-    // Événement personnalisé pour les changements dans le même onglet
-    const handleCustomStorageChange = () => {
-      handleStorageChange()
-    }
-
-    window.addEventListener('storage', handleStorageChange)
-    window.addEventListener('localStorageUpdated', handleCustomStorageChange)
-    
-    // Polling de secours toutes les 500ms
-    const interval = setInterval(() => {
-      handleStorageChange()
-    }, 500)
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange)
-      window.removeEventListener('localStorageUpdated', handleCustomStorageChange)
-      clearInterval(interval)
-    }
-  }, [])
+  const selectedCharacter: Character | null = useMemo(() => {
+    if (!selectedCharacterId) return null
+    return charactersData.characters.find(c => c.id === selectedCharacterId) ?? null
+  }, [selectedCharacterId])
 
   const handleDiceRoll = (type: 'win' | 'lose') => {
     setActionType(type)
@@ -109,15 +59,14 @@ export function Game({ className }: GameProps) {
         setActionType(null)
 
         // PUIS animer case par case
-        const targetStep = Math.min(currentStep + additionalStep, maxSteps - 1)
-        let step = currentStep
+        const baseStep = currentStep
+        const targetStep = Math.min(baseStep + additionalStep, maxSteps - 1)
+        let step = baseStep
         
         const animateStep = () => {
           if (step < targetStep) {
             step++
             setCurrentStep(step)
-            localStorage.setItem('gameProgress', step.toString())
-            window.dispatchEvent(new Event('localStorageUpdated'))
             
             // Délai entre chaque case (700ms pour correspondre à l'animation CSS)
             setTimeout(animateStep, 700)

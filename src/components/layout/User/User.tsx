@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 import background from '@/assets/background/boutique.png'
 import charactersData from '@/data/character.json'
+import { useGameStore } from '@/store/gameStore'
 
 interface Character {
   id: string
@@ -19,10 +20,31 @@ interface UserProps {
 
 export function User({ className }: UserProps) {
   const characters: Character[] = charactersData.characters
+  const selectedCharacterId = useGameStore(s => s.selectedCharacterId)
+  const setSelectedCharacter = useGameStore(s => s.setSelectedCharacter)
   const [currentIndex, setCurrentIndex] = useState(0)
 
-  const currentCharacter = characters[currentIndex];
-  localStorage.setItem('selectedCharacter', currentCharacter.id);
+  // Sync index from store's selectedCharacterId
+  useEffect(() => {
+    if (!selectedCharacterId) {
+      // default to first on first load
+      setSelectedCharacter(characters[0]?.id ?? null)
+      setCurrentIndex(0)
+    } else {
+      const idx = characters.findIndex(c => c.id === selectedCharacterId)
+      setCurrentIndex(idx >= 0 ? idx : 0)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    if (selectedCharacterId) {
+      const idx = characters.findIndex(c => c.id === selectedCharacterId)
+      if (idx >= 0 && idx !== currentIndex) setCurrentIndex(idx)
+    }
+  }, [selectedCharacterId])
+
+  const currentCharacter = useMemo(() => characters[currentIndex], [characters, currentIndex])
 
   const nextCharacter = () => {
     const newIndex = (currentIndex + 1) % characters.length;
@@ -38,8 +60,8 @@ export function User({ className }: UserProps) {
 
   const changeCharacter = (index: number) => {
     const newCharacter = characters[index];
-    // Ici vous pouvez sauvegarder le choix dans le localStorage ou un état global
-    localStorage.setItem('selectedCharacter', newCharacter.id);
+    // Persist into global store
+    setSelectedCharacter(newCharacter.id)
   }
 
   return (

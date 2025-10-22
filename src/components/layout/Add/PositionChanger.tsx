@@ -1,30 +1,18 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { MapPin, ArrowRight } from 'lucide-react'
-import gamePathData from '@/data/gamePath.json'
+import { useGameStore } from '@/store/gameStore'
 
 export function PositionChanger() {
-  const [currentStep, setCurrentStep] = useState(0)
+  const currentStep = useGameStore(s => s.currentStep)
+  const maxSteps = useGameStore(s => s.maxSteps)
+  const setCurrentStep = useGameStore(s => s.setCurrentStep)
+  const setMaxSteps = useGameStore(s => s.setMaxSteps)
   const [newStep, setNewStep] = useState('')
-  const [maxSteps, setMaxSteps] = useState(gamePathData.maxSteps)
   const [newMaxSteps, setNewMaxSteps] = useState('')
-
-  useEffect(() => {
-    // Récupérer la position actuelle depuis localStorage
-    const storedProgress = localStorage.getItem('gameProgress')
-    if (storedProgress) {
-      setCurrentStep(parseInt(storedProgress, 10))
-    }
-
-    // Récupérer le nombre d'étapes depuis localStorage
-    const storedMaxSteps = localStorage.getItem('gameMaxSteps')
-    if (storedMaxSteps) {
-      setMaxSteps(parseInt(storedMaxSteps, 10))
-    }
-  }, [])
 
   const handleChangePosition = () => {
     const stepNumber = parseInt(newStep, 10)
@@ -41,12 +29,8 @@ export function PositionChanger() {
 
     // Mettre à jour la position (convertir case en index: case 1 = index 0)
     const indexPosition = stepNumber - 1
-    localStorage.setItem('gameProgress', indexPosition.toString())
     setCurrentStep(indexPosition)
     setNewStep('')
-    
-    // Déclencher un événement personnalisé pour notifier les autres composants
-    window.dispatchEvent(new Event('localStorageUpdated'))
   }
 
   const handleChangeMaxSteps = () => {
@@ -63,19 +47,8 @@ export function PositionChanger() {
     }
 
     // Mettre à jour le nombre d'étapes
-    localStorage.setItem('gameMaxSteps', newMax.toString())
     setMaxSteps(newMax)
     setNewMaxSteps('')
-
-    // Ajuster la position actuelle si elle dépasse la nouvelle limite
-    if (currentStep >= newMax) {
-      const newPosition = newMax - 1
-      localStorage.setItem('gameProgress', newPosition.toString())
-      setCurrentStep(newPosition)
-    }
-    
-    // Déclencher un événement personnalisé pour notifier les autres composants
-    window.dispatchEvent(new Event('localStorageUpdated'))
   }
 
   return (
