@@ -1,11 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
-import { Shield } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Shield, RefreshCw } from 'lucide-react'
 import { useGameStore } from '@/store/gameStore'
 
 export function AdminPanel() {
   const isAdminMode = useGameStore(s => s.isAdminMode)
   const setIsAdminMode = useGameStore(s => s.setIsAdminMode)
+  const resetAll = useGameStore(s => s.resetAll)
 
   const toggleAdminMode = () => {
     setIsAdminMode(!isAdminMode)
@@ -83,6 +85,32 @@ export function AdminPanel() {
               </div>
             </div>
           </div>
+
+          {isAdminMode && (
+            <div className="bg-white/10 rounded-lg p-4 border border-white/30">
+              <h3 className="text-white font-semibold mb-3 text-center">⚠️ Réinitialisation totale</h3>
+              <Button
+                onClick={() => {
+                  // Nettoyer les clés de quiz dans le localStorage
+                  const keysToRemove: string[] = []
+                  for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i)
+                    if (key && key.startsWith('quiz_')) keysToRemove.push(key)
+                  }
+                  keysToRemove.forEach(k => localStorage.removeItem(k))
+                  // Réinitialiser le store
+                  resetAll()
+                }}
+                className="w-full bg-red-500/80 hover:bg-red-600 text-white border border-red-300"
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                [Admin] Tout réinitialiser
+              </Button>
+              <p className="text-white/70 text-xs mt-2 text-center">
+                Efface la progression, l'étoile et les données des quiz.
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

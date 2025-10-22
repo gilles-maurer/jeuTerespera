@@ -10,6 +10,7 @@ interface GameState {
   currentStep: number
   maxSteps: number
   isAdminMode: boolean
+  victoryCount: number
 
   // Actions
   setSelectedCharacter: (id: CharacterId) => void
@@ -18,6 +19,9 @@ interface GameState {
   setMaxSteps: (max: number) => void
   setIsAdminMode: (enabled: boolean) => void
   resetGame: () => void
+  restartGame: () => void
+  incrementVictory: () => void
+  resetAll: () => void
 }
 
 export const useGameStore = create<GameState>()(
@@ -27,6 +31,7 @@ export const useGameStore = create<GameState>()(
       currentStep: 0,
       maxSteps: gamePathData.maxSteps ?? 40,
       isAdminMode: false,
+  victoryCount: 0,
 
       setSelectedCharacter: (id) => set({ selectedCharacterId: id }),
 
@@ -49,7 +54,16 @@ export const useGameStore = create<GameState>()(
 
       setIsAdminMode: (enabled) => set({ isAdminMode: enabled }),
 
-      resetGame: () => set({ currentStep: 0, maxSteps: gamePathData.maxSteps ?? 40 })
+      resetGame: () => set({ currentStep: 0, maxSteps: gamePathData.maxSteps ?? 40 }),
+      restartGame: () => set({ currentStep: 0 }),
+      incrementVictory: () => set((state) => ({ victoryCount: state.victoryCount + 1 })),
+      resetAll: () => set({
+        selectedCharacterId: null,
+        currentStep: 0,
+        maxSteps: gamePathData.maxSteps ?? 40,
+        isAdminMode: false,
+        victoryCount: 0,
+      }),
     }),
     {
       name: 'gameStore',
@@ -58,6 +72,7 @@ export const useGameStore = create<GameState>()(
         currentStep: state.currentStep,
         maxSteps: state.maxSteps,
         isAdminMode: state.isAdminMode,
+        victoryCount: state.victoryCount,
       }),
     }
   )

@@ -325,16 +325,7 @@ export function GamePath({ maxSteps, currentStep, characterImage, className }: G
         </div>
       </div>
 
-      {/* Message de fin uniquement (suppression de "Prochaine étape" pour gagner de la place) */}
-      {currentStep === maxSteps - 1 && (
-  <div className="w-full max-w-full mb-2">
-          <div className="bg-gradient-to-r from-yellow-400/30 to-orange-500/30 backdrop-blur-md rounded-xl p-3 border-2 border-yellow-400/50 animate-pulse">
-            <p className="text-white font-bold text-center text-base flex items-center justify-center gap-2">
-              🏆 Dernière case ! 🏆
-            </p>
-          </div>
-        </div>
-      )}
+      {/* Message de fin géré via popup de victoire dans Game.tsx */}
 
       {/* Animation CSS pour le flottement */}
       <style>{`
