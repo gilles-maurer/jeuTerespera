@@ -9,6 +9,8 @@ import background from '@/assets/background/village.png'
 import charactersData from '@/data/character.json'
 import { GamePath } from './Game/GamePath'
 import { useGameStore } from '@/store/gameStore'
+import { DotLottieReact } from '@lottiefiles/dotlottie-react'
+import diceLottie from '@/assets/gifs/Dice roll.lottie?url'
 
 interface Character {
   id: string
@@ -35,6 +37,12 @@ export function Game({ className }: GameProps) {
   const [actionType, setActionType] = useState<'win' | 'lose' | null>(null)
   const [showVictory, setShowVictory] = useState(false)
 
+  // Timings (ajustables)
+  const ROLL_DURATION_MS = 3300        // durée de l'animation Lottie de dé (était 1200)
+  const RESULT_SHOW_MS = 1600         // durée d'affichage du résultat (était 1000)
+  const STEP_ANIM_DELAY_MS = 700      // délai entre chaque case animée (inchangé)
+  const STEP_START_DELAY_MS = 250     // délai avant de démarrer l'animation des pas (était 200)
+
   const selectedCharacter: Character | null = useMemo(() => {
     if (!selectedCharacterId) return null
     return charactersData.characters.find(c => c.id === selectedCharacterId) ?? null
@@ -54,7 +62,7 @@ export function Game({ className }: GameProps) {
       setDiceResult(additionalStep)
       setIsRolling(false)
 
-      // Afficher le résultat pendant 1s
+      // Laisser le résultat affiché un peu plus longtemps
       setTimeout(() => {
         // Fermer le modal IMMÉDIATEMENT
         setIsModalOpen(false)
@@ -71,15 +79,15 @@ export function Game({ className }: GameProps) {
             step++
             setCurrentStep(step)
             
-            // Délai entre chaque case (700ms pour correspondre à l'animation CSS)
-            setTimeout(animateStep, 700)
+            // Délai entre chaque case
+            setTimeout(animateStep, STEP_ANIM_DELAY_MS)
           }
         }
         
         // Démarrer l'animation après un court délai
-        setTimeout(animateStep, 200)
-      }, 1000)
-    }, 1200)
+        setTimeout(animateStep, STEP_START_DELAY_MS)
+      }, RESULT_SHOW_MS)
+    }, ROLL_DURATION_MS)
   }
 
   // Afficher la popup de victoire après un léger délai quand on atteint la dernière case
@@ -145,20 +153,20 @@ export function Game({ className }: GameProps) {
               {/* Zone d'animation du dé */}
               {isRolling || diceResult !== null ? (
                 <div className="flex items-center justify-center min-h-[150px] mb-6">
-                  <div className={cn(
-                    "text-8xl font-bold text-white",
-                    isRolling && "animate-dice-roll"
-                  )}>
-                    {isRolling ? (
-                      <span className="inline-block">
-                        {Math.floor(Math.random() * 6) + 1}
-                      </span>
-                    ) : (
-                      <span className="inline-block animate-dice-bounce">
-                        {diceResult}
-                      </span>
-                    )}
-                  </div>
+                  {isRolling ? (
+                    <div className="w-28 h-28">
+                      <DotLottieReact
+                        src={diceLottie}
+                        loop
+                        autoplay
+                        style={{ width: '100%', height: '100%' }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="text-7xl font-extrabold text-white">
+                      {diceResult}
+                    </div>
+                  )}
                 </div>
               ) : (
                 /* Boutons de choix */
