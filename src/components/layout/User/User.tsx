@@ -92,11 +92,11 @@ export function User({ className }: UserProps) {
               </Button>
 
               {/* Image du personnage en grand */}
-              <div className="w-full max-w-md h-64 md:h-80 flex items-center justify-center">
+              <div className="w-full max-w-md h-[45vh] md:h-[45vh] flex items-center justify-center">
                 <img
                   src={new URL(`../../../assets/characters/${currentCharacter.image}`, import.meta.url).href}
                   alt={currentCharacter.name}
-                  className="max-h-full max-w-full object-contain drop-shadow-2xl"
+                  className="h-full w-auto object-contain drop-shadow-2xl"
                 />
               </div>
 

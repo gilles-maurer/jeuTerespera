@@ -9,7 +9,10 @@ interface GamePathProps {
 }
 
 export function GamePath({ maxSteps, currentStep, characterImage, className }: GamePathProps) {
-  const progressPercentage = ((currentStep + 1) / maxSteps) * 100
+  // Progress percentage safeguarded for dynamic maxSteps
+  const safeMax = Math.max(1, maxSteps)
+  const safeCurrent = Math.min(Math.max(0, currentStep), safeMax - 1)
+  const progressPercentage = ((safeCurrent + 1) / safeMax) * 100
 
   // Mesure du conteneur pour un layout responsive
   const containerRef = useRef<HTMLDivElement>(null)
@@ -78,7 +81,8 @@ export function GamePath({ maxSteps, currentStep, characterImage, className }: G
 
   const yOffset = Math.max(nodeH * 0.9, radius * 0.68)
 
-  const charSize = Math.min(Math.max(w * 0.24, 96), 160)
+  // Character size based primarily on container/viewport height for consistent visual height
+  const charSize = Math.min(Math.max(h * 0.2, 140), 240)
 
     return { nodeW, nodeH, radius, angleSpacing, yOffset, charSize }
   }, [size.width, size.height])
@@ -153,26 +157,34 @@ export function GamePath({ maxSteps, currentStep, characterImage, className }: G
             </div>
           </div>
 
-          {/* Mini chemin avec toutes les cases */}
-          <div className="flex items-center gap-1 overflow-hidden">
-            {Array.from({ length: maxSteps }).map((_, index) => {
-              const state = 
-                index < currentStep ? 'past' :
-                index === currentStep ? 'current' :
-                'future'
-              
-              return (
-                <div
-                  key={index}
-                  className={cn(
-                    "flex-shrink-0 w-1.5 h-1.5 rounded-full transition-all duration-500",
-                    state === 'past' && "bg-green-400 shadow-sm shadow-green-400/50",
-                    state === 'current' && "bg-blue-500 scale-150 shadow-lg shadow-blue-500/50 ring-2 ring-blue-300/50",
-                    state === 'future' && "bg-white/30"
-                  )}
-                />
-              )
-            })}
+          {/* Mini chemin (downsampled) */}
+          <div className="flex items-center justify-between overflow-hidden">
+            {(() => {
+              // Cap the number of dots to keep UI light for large maxSteps
+              const approxByWidth = size.width ? Math.max(24, Math.floor(size.width / 12)) : 48
+              const dotCount = Math.min(safeMax, approxByWidth)
+              const dots = [] as Array<{ start: number; end: number; key: number }>
+              for (let i = 0; i < dotCount; i++) {
+                const start = Math.floor((i / dotCount) * safeMax)
+                const end = Math.max(start, Math.floor(((i + 1) / dotCount) * safeMax) - 1)
+                dots.push({ start, end, key: i })
+              }
+              return dots.map(({ start, end, key }) => {
+                const state = safeCurrent > end ? 'past' : safeCurrent < start ? 'future' : 'current'
+                return (
+                  <div
+                    key={key}
+                    className={cn(
+                      "flex-shrink-0 w-1.5 h-1.5 rounded-full transition-all duration-500",
+                      state === 'past' && "bg-green-400 shadow-sm shadow-green-400/50",
+                      state === 'current' && "bg-blue-500 scale-150 shadow-lg shadow-blue-500/50 ring-2 ring-blue-300/50",
+                      state === 'future' && "bg-white/30"
+                    )}
+                    title={`${start + 1}–${end + 1}`}
+                  />
+                )
+              })
+            })()}
           </div>
 
           {/* Étapes importantes (chaque 10 cases) */}
@@ -304,7 +316,7 @@ export function GamePath({ maxSteps, currentStep, characterImage, className }: G
                     <img
                       src={characterImage}
                       alt="Character"
-                      className="max-h-full max-w-full object-contain drop-shadow-2xl"
+                      className="h-full w-auto object-contain drop-shadow-2xl"
                       style={{
                         filter: 'drop-shadow(0 0 20px rgba(59, 130, 246, 0.8))',
                         animation: 'float 3s ease-in-out infinite'

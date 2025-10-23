@@ -76,12 +76,12 @@ export function AdminPanel() {
                 <p className="text-white/60 text-xs">Modifier la position et le nombre d'étapes</p>
               </div>
               <div className="bg-black/20 rounded p-2">
-                <p className="text-white font-mono text-sm">quiz777</p>
-                <p className="text-white/60 text-xs">Quiz 1 - La légende de Terespera (+3 cases)</p>
+                <p className="text-white font-mono text-sm">quiz77</p>
+                <p className="text-white/60 text-xs">Quiz 77 - Texte à trous (+3 cases)</p>
               </div>
               <div className="bg-black/20 rounded p-2">
-                <p className="text-white font-mono text-sm">quiz888</p>
-                <p className="text-white/60 text-xs">Quiz 2 - L'aventure continue (+5 cases)</p>
+                <p className="text-white font-mono text-sm">quiz88</p>
+                <p className="text-white/60 text-xs">Quiz 88 - QCM (bonus proportionnel, max 5 cases)</p>
               </div>
             </div>
           </div>

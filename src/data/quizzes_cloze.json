@@ -1,0 +1,30 @@
+[
+  {
+    "id": "quiz77",
+    "mode": "cloze",
+    "title": "Sur les routes de Terespera",
+    "bonusSteps": 5,
+    "text": "🎵 Sur les routes de Terespera 🎵\n\nCouplet 1\nBibule avait {0} chansons,\nDes sourires plein son {1}.\nIl préférait {2} au {3},\nEt semait {4} pas à pas.\n\nCouplet 2\nAbaiete dansait le {5},\nSes pas légers, son {6} chantant.\nElle rêvait de {7},\nEt d’histoires à raconter.\n\nRefrain\nÔ Bibule et Abaiete, troubadours aux cœurs de fête !\n{8} l’amour, {9} la vie,\nFont danser {10}.\n\nCouplet 3\nUn jour, d’un “oui” naquit {11},\nDe vivre libres, sans {12}.\nDe Terespera les chemins\nGardent l’écho de {13}.\n\nPont (optionnel)\nQuand le ciel devient tout {14},\nIls arrivent, et tout sourit.\nCar leur chanson et leurs refrains\nRedonnent {15} au matin.\n\nRefrain (repris)\nÔ Bibule et Abaiete, troubadours aux cœurs de fête !\n{16} l’amour, {17} la vie,\nFont danser {18}.",
+    "questions": [
+      { "id": 0, "options": [{ "text": "mille", "correct": true }] },
+      { "id": 1, "options": [{ "text": "baluchon", "correct": true }] },
+      { "id": 2, "options": [{ "text": "l’art", "correct": true }] },
+      { "id": 3, "options": [{ "text": "combat", "correct": true }] },
+      { "id": 4, "options": [{ "text": "la joie", "correct": true }] },
+      { "id": 5, "options": [{ "text": "vent", "correct": true }] },
+      { "id": 6, "options": [{ "text": "cœur", "correct": true }] },
+      { "id": 7, "options": [{ "text": "liberté", "correct": true }] },
+      { "id": 8, "options": [{ "text": "Chantent", "correct": true }] },
+      { "id": 9, "options": [{ "text": "jonglent", "correct": true }] },
+      { "id": 10, "options": [{ "text": "grands et petits", "correct": true }] },
+      { "id": 11, "options": [{ "text": "l’espoir", "correct": true }] },
+      { "id": 12, "options": [{ "text": "devoirs", "correct": true }] },
+      { "id": 13, "options": [{ "text": "leurs refrains", "correct": true }] },
+      { "id": 14, "options": [{ "text": "gris", "correct": true }] },
+      { "id": 15, "options": [{ "text": "des couleurs", "correct": true }] },
+      { "id": 16, "options": [{ "text": "Chantent", "correct": true }] },
+      { "id": 17, "options": [{ "text": "jonglent", "correct": true }] },
+      { "id": 18, "options": [{ "text": "grands et petits", "correct": true }] }
+    ]
+  }
+]

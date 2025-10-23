@@ -1,13 +1,13 @@
 [
   {
-    "id": "quiz1",
+    "id": "quiz77",
+    "mode": "cloze",
     "title": "La légende de Terespera",
     "bonusSteps": 3,
     "text": "Il était une fois dans le royaume de {0}, un brave héros nommé {1} qui devait affronter {2} pour sauver la princesse.",
     "questions": [
       {
         "id": 0,
-        "type": "select",
         "options": [
           { "text": "Terespera", "correct": true },
           { "text": "Mordor", "correct": false },
@@ -16,7 +16,6 @@
       },
       {
         "id": 1,
-        "type": "select",
         "options": [
           { "text": "Bibule", "correct": true },
           { "text": "Gandalf", "correct": false },
@@ -25,7 +24,6 @@
       },
       {
         "id": 2,
-        "type": "select",
         "options": [
           { "text": "le dragon", "correct": true },
           { "text": "le méchant sorcier", "correct": false },
@@ -35,36 +33,54 @@
     ]
   },
   {
-    "id": "quiz2",
-    "title": "L'aventure continue",
-    "bonusSteps": 5,
-    "text": "Pour traverser la forêt enchantée, il faut utiliser {0} et éviter les {1}, car seul {2} peut les vaincre.",
+    "id": "quiz88",
+    "mode": "mcq",
+    "title": "Le défi des sages",
+    "bonusPerCorrect": 1,
     "questions": [
       {
         "id": 0,
-        "type": "select",
+        "prompt": "Quelle est la couleur du ciel par temps clair ?",
         "options": [
-          { "text": "la carte magique", "correct": true },
-          { "text": "une boussole", "correct": false },
-          { "text": "un GPS", "correct": false }
+          { "text": "Bleu", "correct": true },
+          { "text": "Vert", "correct": false },
+          { "text": "Rouge", "correct": false }
         ]
       },
       {
         "id": 1,
-        "type": "select",
+        "prompt": "Combien font 2 + 2 ?",
         "options": [
-          { "text": "trolls de pierre", "correct": true },
-          { "text": "zombies", "correct": false },
-          { "text": "loups-garous", "correct": false }
+          { "text": "4", "correct": true },
+          { "text": "22", "correct": false },
+          { "text": "5", "correct": false }
         ]
       },
       {
         "id": 2,
-        "type": "select",
+        "prompt": "Quel animal miaule ?",
         "options": [
-          { "text": "le courage", "correct": true },
-          { "text": "la magie noire", "correct": false },
-          { "text": "une épée laser", "correct": false }
+          { "text": "Le chat", "correct": true },
+          { "text": "Le chien", "correct": false },
+          { "text": "Le cheval", "correct": false }
+        ]
+      },
+      {
+        "id": 3,
+        "prompt": "Quelle saison suit le printemps ?",
+        "options": [
+          { "text": "L'été", "correct": true },
+          { "text": "L'hiver", "correct": false },
+          { "text": "L'automne", "correct": false }
+        ]
+      },
+      {
+        "id": 4,
+        "prompt": "Quelle boisson est riche en caféine ?",
+        "options": [
+          { "text": "Le café", "correct": true },
+          { "text": "L'eau", "correct": false },
+          { "text": "Le lait", "correct": false }
         ]
       }
     ]

@@ -1,0 +1,135 @@
+[
+  {
+    "id": "quiz88",
+    "mode": "mcq",
+    "title": "Le quiz du rallye",
+    "maxBonus": 5,
+    "questions": [
+      {
+        "id": 0,
+        "prompt": "Combien d'oiseaux ont été présentés ?",
+        "options": [
+          { "text": "7", "correct": true },
+          { "text": "8", "correct": false },
+          { "text": "9", "correct": false }
+        ]
+      },
+      {
+        "id": 1,
+        "prompt": "Quel oiseau ne voulait pas voler pendant la représentation ?",
+        "options": [
+          { "text": "Aigle des steppes", "correct": true },
+          { "text": "Hiboux grand duc", "correct": false },
+          { "text": "Buse de Harris", "correct": false }
+        ]
+      },
+      {
+        "id": 2,
+        "prompt": "Combien de moines ont jonglé lors du spectacle final ?",
+        "options": [
+          { "text": "2", "correct": false },
+          { "text": "3", "correct": true },
+          { "text": "4", "correct": false }
+        ]
+      },
+      {
+        "id": 3,
+        "prompt": "Avec combien de balles ont-ils réussi à jongler au maximum ?",
+        "options": [
+          { "text": "14", "correct": false },
+          { "text": "16", "correct": false },
+          { "text": "12", "correct": true }
+        ]
+      },
+      {
+        "id": 4,
+        "prompt": "Combien y avait-il de danseurs à la chorégraphie ?",
+        "options": [
+          { "text": "9", "correct": true },
+          { "text": "7", "correct": false },
+          { "text": "8", "correct": false }
+        ]
+      },
+      {
+        "id": 5,
+        "prompt": "Combien y avait-il de pancartes pour le sketch d'intro ?",
+        "options": [
+          { "text": "12", "correct": false },
+          { "text": "10", "correct": true },
+          { "text": "8", "correct": false }
+        ]
+      },
+      {
+        "id": 6,
+        "prompt": "Comment s'appelaient les chevaux ?",
+        "options": [
+          { "text": "Charanne et Capsule", "correct": true },
+          { "text": "Mirage et Drosane", "correct": false },
+          { "text": "Nivanne et Nibule", "correct": false }
+        ]
+      },
+      {
+        "id": 7,
+        "prompt": "De quoi était composé le burger du banquet ?",
+        "options": [
+          { "text": "Fromage frais, poulet, salade", "correct": true },
+          { "text": "Bacon, cheddar, steak", "correct": false },
+          { "text": "Tomate, jambon, œuf", "correct": false }
+        ]
+      },
+      {
+        "id": 8,
+        "prompt": "Combien de kilos de cailloux ont été achetés pour le grand jeu ?",
+        "options": [
+          { "text": "25 kg", "correct": false },
+          { "text": "50 kg", "correct": true },
+          { "text": "80 kg", "correct": false }
+        ]
+      },
+      {
+        "id": 9,
+        "prompt": "Qui a gagné au concours entre Laignal et Amanevis ?",
+        "options": [
+          { "text": "Laignal", "correct": true },
+          { "text": "Amanevis", "correct": false }
+        ]
+      },
+      {
+        "id": 10,
+        "prompt": "Combien y a-t-il de versions des porte-clés de la foire ?",
+        "options": [
+          { "text": "3", "correct": false },
+          { "text": "5", "correct": true },
+          { "text": "7", "correct": false }
+        ]
+      },
+      {
+        "id": 11,
+        "prompt": "Combien y avait-il de flûtes à bec ?",
+        "options": [
+          { "text": "1", "correct": false },
+          { "text": "2", "correct": false },
+          { "text": "3", "correct": true }
+        ]
+      },
+      {
+        "id": 12,
+        "prompt": "Combien y avait-il de cartes légendaires (niveau 4) ?",
+        "options": [
+          { "text": "68", "correct": true },
+          { "text": "14", "correct": false },
+          { "text": "35", "correct": false }
+        ]
+      },
+      {
+        "id": 13,
+        "prompt": "Quel membre manquait à Esmarinaz ?",
+        "options": [
+          { "text": "Main gauche", "correct": true },
+          { "text": "Pied droit", "correct": false },
+          { "text": "Main droite", "correct": false }
+        ]
+      }
+    ]
+  }
+]

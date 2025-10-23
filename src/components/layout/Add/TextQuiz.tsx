@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { BookOpen, CheckCircle, XCircle, RefreshCw } from 'lucide-react'
-import quizzesData from '@/data/quizzes.json'
+import quizzesData from '@/data/quizzes_cloze.json'
 import { useGameStore } from '@/store/gameStore'
 
 interface QuizOption {
@@ -12,14 +12,14 @@ interface QuizOption {
 
 interface QuizQuestion {
   id: number
-  type: string
   options: QuizOption[]
 }
 
 interface Quiz {
   id: string
   title: string
-  bonusSteps: number
+  mode?: 'cloze'
+  bonusSteps?: number
   text: string
   questions: QuizQuestion[]
 }
@@ -28,122 +28,115 @@ interface TextQuizProps {
   quizIndex?: number
 }
 
-// Fonction pour mélanger un tableau (Fisher-Yates shuffle)
-const shuffleArray = <T,>(array: T[]): T[] => {
-  const shuffled = [...array]
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-  }
-  return shuffled
-}
-
 export function TextQuiz({ quizIndex = 0 }: TextQuizProps) {
-  const currentStepStore = useGameStore(s => s.currentStep)
-  const maxSteps = useGameStore(s => s.maxSteps)
-  const setCurrentStepStore = useGameStore(s => s.setCurrentStep)
-  const isAdminMode = useGameStore(s => s.isAdminMode)
-  // IMPORTANT: Mettre quiz dans le state pour qu'il se mette à jour quand quizIndex change
-  const [quiz, setQuiz] = useState<Quiz>(() => {
-    // Mélanger les options dès l'initialisation
-    const originalQuiz = quizzesData[quizIndex]
+  // Store bindings
+  const currentStepStore = useGameStore((s) => s.currentStep)
+  const maxSteps = useGameStore((s) => s.maxSteps)
+  const setCurrentStepStore = useGameStore((s) => s.setCurrentStep)
+  const isAdminMode = useGameStore((s) => s.isAdminMode)
+
+  // Normalize raw quiz data to strong shape
+  const normalizeQuiz = (raw: any): Quiz => {
     return {
-      ...originalQuiz,
-      questions: originalQuiz.questions.map(q => ({
-        ...q,
-        options: shuffleArray(q.options)
-      }))
+      id: String(raw.id),
+      title: String(raw.title),
+      mode: 'cloze',
+      bonusSteps: Number.isFinite(raw.bonusSteps) ? Number(raw.bonusSteps) : 0,
+      text: String(raw.text || ''),
+      questions: (raw.questions || []).map((q: any) => ({
+        id: Number(q.id),
+        options: (q.options || []).map((o: any) => ({
+          text: String(o.text),
+          correct: !!o.correct,
+        })),
+      })),
     }
-  })
-  const [answers, setAnswers] = useState<{ [key: number]: string }>({})
+  }
+
+  // Local component state
+  const [quiz, setQuiz] = useState<Quiz>(() => normalizeQuiz((quizzesData as any)[quizIndex]))
+  const [answers, setAnswers] = useState<Record<number, string>>({})
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
   const [lives, setLives] = useState(3)
   const [hasWon, setHasWon] = useState(false)
+  const [locked, setLocked] = useState<Record<number, boolean>>({})
 
-  // Réinitialiser TOUT le quiz quand l'index change
+  // When quizIndex changes, reload quiz and restore lives/won flags
   useEffect(() => {
-    const originalQuiz = quizzesData[quizIndex]
-    // Mélanger les options à chaque changement de quiz
-    const shuffledQuiz = {
-      ...originalQuiz,
-      questions: originalQuiz.questions.map(q => ({
-        ...q,
-        options: shuffleArray(q.options)
-      }))
-    }
-    setQuiz(shuffledQuiz)
+    const raw = (quizzesData as any)[quizIndex]
+    const next = normalizeQuiz(raw)
+    setQuiz(next)
     setAnswers({})
     setIsSubmitted(false)
     setIsCorrect(false)
-    
-    const storedLives = localStorage.getItem(`quiz_${originalQuiz.id}_lives`)
+    setLocked({})
+
+    const storedLives = localStorage.getItem(`quiz_${next.id}_lives`)
     setLives(storedLives ? parseInt(storedLives, 10) : 3)
-    
-    const storedWon = localStorage.getItem(`quiz_${originalQuiz.id}_won`)
+    const storedWon = localStorage.getItem(`quiz_${next.id}_won`)
     setHasWon(storedWon === 'true')
   }, [quizIndex])
 
+  // Sync view of current step from store
   useEffect(() => {
-    // Sync view of currentStep from store
     setCurrentStep(currentStepStore)
   }, [currentStepStore])
 
+  // Note: previously we computed allAnswersFilled to disable the button until filled,
+  // but the current UX keeps the button always enabled.
+
   const handleAnswerChange = (questionId: number, value: string) => {
-    setAnswers(prev => ({
-      ...prev,
-      [questionId]: value
-    }))
+    setAnswers((prev) => ({ ...prev, [questionId]: value }))
   }
 
   const checkAnswers = () => {
-    let allCorrect = true
-
-    for (const question of quiz.questions) {
-      const userAnswer = answers[question.id]
-      const correctOption = question.options.find(opt => opt.correct)
-      
-      if (!userAnswer || userAnswer !== correctOption?.text) {
-        allCorrect = false
+    let ok = true
+    for (const q of quiz.questions) {
+      const user = (answers[q.id] ?? '').trim().toLowerCase()
+      const correctAns = (q.options.find((o) => o.correct)?.text ?? '').trim().toLowerCase()
+      if (!user || user !== correctAns) {
+        ok = false
         break
       }
     }
-
-    setIsCorrect(allCorrect)
+    setIsCorrect(ok)
     setIsSubmitted(true)
 
-    if (allCorrect) {
-      // Ajouter les cases bonus en s'appuyant sur le store
-      const newStep = Math.min(currentStepStore + quiz.bonusSteps, maxSteps - 1)
+    if (ok) {
+      const bonus = quiz.bonusSteps ?? 0
+      const newStep = Math.min(currentStepStore + bonus, maxSteps - 1)
       setCurrentStepStore(newStep)
       setCurrentStep(newStep)
-      
-      // Marquer le quiz comme gagné
       setHasWon(true)
       localStorage.setItem(`quiz_${quiz.id}_won`, 'true')
     } else {
-      // Retirer une vie en cas d'échec
       const newLives = lives - 1
       setLives(newLives)
-      localStorage.setItem(`quiz_${quiz.id}_lives`, newLives.toString())
+      localStorage.setItem(`quiz_${quiz.id}_lives`, String(newLives))
     }
   }
 
   const resetQuiz = () => {
-    setAnswers({})
+    // Only clear wrong answers; keep correct ones prefilled
+    const next: Record<number, string> = {}
+    const nextLocked: Record<number, boolean> = {}
+    for (const q of quiz.questions) {
+      const user = (answers[q.id] ?? '').trim().toLowerCase()
+      const correctAns = (q.options.find((o) => o.correct)?.text ?? '').trim().toLowerCase()
+      if (user && user === correctAns) {
+        next[q.id] = answers[q.id]
+        nextLocked[q.id] = true
+      } else {
+        next[q.id] = ''
+        nextLocked[q.id] = false
+      }
+    }
+    setAnswers(next)
+    setLocked(nextLocked)
     setIsSubmitted(false)
     setIsCorrect(false)
-    
-    // Mélanger à nouveau les options
-    const shuffledQuiz = {
-      ...quiz,
-      questions: quiz.questions.map(q => ({
-        ...q,
-        options: shuffleArray(q.options)
-      }))
-    }
-    setQuiz(shuffledQuiz)
   }
 
   const handleResetLives = () => {
@@ -154,87 +147,77 @@ export function TextQuiz({ quizIndex = 0 }: TextQuizProps) {
     setAnswers({})
     setIsSubmitted(false)
     setIsCorrect(false)
-    
-    // Mélanger à nouveau les options
-    const originalQuiz = quizzesData[quizIndex]
-    const shuffledQuiz = {
-      ...originalQuiz,
-      questions: originalQuiz.questions.map(q => ({
-        ...q,
-        options: shuffleArray(q.options)
-      }))
-    }
-    setQuiz(shuffledQuiz)
+    setLocked({})
   }
 
-  // Fonction pour rendre le texte avec les select boxes
-  const renderTextWithBlanks = () => {
-    const parts = quiz.text.split(/(\{\d+\})/)
-    
+  // Render helpers
+  const renderTextWithInputs = () => {
+    const parts = (quiz.text || '').split(/(\{\d+\})/g)
     return (
-      <div className="text-lg leading-relaxed">
+      <span>
         {parts.map((part, index) => {
-          const match = part.match(/\{(\d+)\}/)
-          if (match) {
-            const questionId = parseInt(match[1], 10)
-            const question = quiz.questions.find(q => q.id === questionId)
-            
-            if (!question) return null
+          const m = part.match(/\{(\d+)\}/)
+          if (!m) return <span key={index}>{part}</span>
+          const qid = parseInt(m[1], 10)
+          const question = quiz.questions.find((q) => q.id === qid)
+          if (!question) return <span key={index}>?</span>
+          const userAnswer = answers[qid] ?? ''
+          const correctAnswer = question.options.find((o) => o.correct)?.text ?? ''
+          const isLocked = !isSubmitted && locked[qid] === true
 
-            const userAnswer = answers[questionId]
-            const correctAnswer = question.options.find(opt => opt.correct)?.text
-
+          if (!isSubmitted) {
+            if (isLocked) {
+              return (
+                <input
+                  key={index}
+                  type="text"
+                  value={userAnswer}
+                  disabled
+                  readOnly
+                  className="mx-1 px-1.5 py-0.5 text-sm rounded-md bg-green-200 text-green-800 border border-green-400 cursor-not-allowed"
+                />
+              )
+            }
             return (
-              <span key={index} className="inline-block mx-1">
-                {!isSubmitted ? (
-                  <select
-                    value={userAnswer || ''}
-                    onChange={(e) => handleAnswerChange(questionId, e.target.value)}
-                    className="px-2 py-1 border-2 border-purple-400 rounded bg-white/90 font-semibold text-purple-700 cursor-pointer hover:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  >
-                    <option value="">?</option>
-                    {question.options.map((option, optIndex) => (
-                      <option key={optIndex} value={option.text}>
-                        {option.text}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <span className={`px-2 py-1 rounded font-semibold ${
-                    userAnswer === correctAnswer
-                      ? 'bg-green-200 text-green-800'
-                      : 'bg-red-200 text-red-800'
-                  }`}>
-                    {userAnswer || '?'}
-                  </span>
-                )}
-              </span>
+              <input
+                key={index}
+                type="text"
+                value={userAnswer}
+                onChange={(e) => handleAnswerChange(qid, e.target.value)}
+                placeholder="Votre réponse"
+                className="mx-1 px-1.5 py-0.5 text-sm border border-white/40 rounded-md bg-white/80 text-purple-800 placeholder-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-400 focus:border-purple-400"
+              />
             )
           }
-          return <span key={index}>{part}</span>
+
+          const isGood = userAnswer.trim().toLowerCase() === correctAnswer.trim().toLowerCase()
+          return (
+            <span
+              key={index}
+              className={`mx-1 px-2 py-1 rounded font-semibold ${isGood ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}
+            >
+              {userAnswer || '?'}
+            </span>
+          )
         })}
-      </div>
+      </span>
     )
   }
 
-  const allAnswersFilled = quiz.questions.every(q => answers[q.id])
-
   return (
-    <div className="max-w-2xl mx-auto">
-      <Card className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-lg border-2 border-purple-400/50">
+    <div className="max-w-xl mx-auto p-4">
+      <Card className="bg-gradient-to-br from-purple-600/60 to-purple-800/60 border-white/20 shadow-xl">
         <CardHeader className="pb-3">
           <CardTitle className="text-white flex items-center justify-center gap-2 text-lg">
             <BookOpen className="h-6 w-6" />
             {quiz.title}
           </CardTitle>
           <div className="text-center mt-2">
-            <p className="text-white/90 text-lg font-semibold">
-              ❤️ {lives}/3
-            </p>
+            <p className="text-white/90 text-lg font-semibold">❤️ {lives}/3</p>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Bouton admin pour reset les vies */}
+          {/* Admin: reset lives when out or already won */}
           {isAdminMode && (lives === 0 || hasWon) && (
             <Button
               onClick={handleResetLives}
@@ -246,16 +229,18 @@ export function TextQuiz({ quizIndex = 0 }: TextQuizProps) {
             </Button>
           )}
 
-          {/* Quiz déjà gagné */}
+          {/* Already won */}
           {hasWon && (
             <div className="bg-green-100 text-green-800 p-4 rounded-lg text-center font-bold">
               <CheckCircle className="h-8 w-8 mx-auto mb-2" />
               <p>✅ Quiz déjà réussi !</p>
-              <p className="text-sm mt-1">+{quiz.bonusSteps} cases gagnées</p>
+              {quiz.bonusSteps ? (
+                <p className="text-sm mt-1">+{quiz.bonusSteps} cases gagnées</p>
+              ) : null}
             </div>
           )}
 
-          {/* Message si plus de vies */}
+          {/* Out of lives */}
           {!hasWon && lives === 0 && (
             <div className="bg-red-100 text-red-800 p-4 rounded-lg text-center font-bold">
               <XCircle className="h-8 w-8 mx-auto mb-2" />
@@ -264,20 +249,17 @@ export function TextQuiz({ quizIndex = 0 }: TextQuizProps) {
             </div>
           )}
 
-          {/* Texte à trous */}
+          {/* Main cloze interaction */}
           {lives > 0 && !hasWon && (
             <>
               <div className="bg-white/10 rounded-lg p-4 border border-white/30">
-                <div className="text-white">
-                  {renderTextWithBlanks()}
-                </div>
+                <div className="text-white whitespace-pre-wrap">{renderTextWithInputs()}</div>
               </div>
 
-              {/* Boutons */}
               {!isSubmitted ? (
                 <Button
                   onClick={checkAnswers}
-                  disabled={!allAnswersFilled}
+                  // je ne veux pas que le bouton soit désactivés
                   className="w-full bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <CheckCircle className="h-5 w-5 mr-2" />
@@ -285,22 +267,19 @@ export function TextQuiz({ quizIndex = 0 }: TextQuizProps) {
                 </Button>
               ) : (
                 <div className="space-y-3">
-                  {/* Résultat */}
-                  <div className={`p-4 rounded-lg text-center font-bold ${
-                    isCorrect
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-red-100 text-red-800'
-                  }`}>
+                  <div
+                    className={`p-4 rounded-lg text-center font-bold ${
+                      isCorrect ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}
+                  >
                     {isCorrect ? (
                       <>
                         <CheckCircle className="h-8 w-8 mx-auto mb-2" />
                         <p className="text-xl">🎉 Bravo !</p>
-                        <p className="text-sm mt-1">
-                          +{quiz.bonusSteps} cases bonus !
-                        </p>
-                        <p className="text-sm mt-1">
-                          Case {currentStep + 1}
-                        </p>
+                        {quiz.bonusSteps ? (
+                          <p className="text-sm mt-1">+{quiz.bonusSteps} cases bonus !</p>
+                        ) : null}
+                        <p className="text-sm mt-1">Case {currentStep + 1}</p>
                       </>
                     ) : (
                       <>
@@ -313,7 +292,6 @@ export function TextQuiz({ quizIndex = 0 }: TextQuizProps) {
                     )}
                   </div>
 
-                  {/* Bouton recommencer */}
                   {!isCorrect && (
                     <Button
                       onClick={resetQuiz}

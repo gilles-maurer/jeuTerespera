@@ -11,6 +11,67 @@
       "name": "Abaiete",
       "description": "Une troubadour chanteuse",
       "image": "abaiete.png"
+    },
+    {
+      "id": "apertis",
+      "name": "Apertis",
+      "description": "",
+      "image": "apertis.PNG"
+    },
+    {
+      "id": "arondel",
+      "name": "Arondel",
+      "description": "",
+      "image": "arondel.png"
+    },
+    {
+      "id": "mazerin",
+      "name": "Mazarin",
+      "description": "",
+      "image": "mazerin.png"
+    },
+    {
+      "id": "laignal",
+      "name": "Laignal",
+      "description": "",
+      "image": "laignal.PNG"
+    },
+    {
+      "id": "esmarirran",
+      "name": "Esmarirran",
+      "description": "",
+      "image": "esmarirran.PNG"
+    },
+    {
+      "id": "reheter",
+      "name": "Reheter",
+      "description": "",
+      "image": "reheter.PNG"
+    },
+    {
+      "id": "amanevis",
+      "name": "Amanevis",
+      "description": "",
+      "image": "amanevis.png"
+    }, 
+    {
+      "id": "kch",
+      "name": "Kch",
+      "description": "",
+      "image": "kch.png"
+    },
+    {
+      "id": "nono",
+      "name": "Chef Nono",
+      "description": "",
+      "image": "nono.png"
+    },
+    {
+      "id": "lea",
+      "name": "Serigala",
+      "description": "",
+      "image": "lea.png"
     }
+  
   ]
 }

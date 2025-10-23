@@ -12,6 +12,19 @@ interface GameState {
   isAdminMode: boolean
   victoryCount: number
 
+  // MCQ quiz persisted progress by quiz id
+  mcqProgress: Record<string, {
+    idx: number
+    selected: string | null
+    correctCount: number
+    finished: boolean
+    showFeedback: boolean
+    lastChosenText: string | null
+    lastChosenCorrect: boolean
+    appliedBonus: number | null
+    done: boolean
+  }>
+
   // Actions
   setSelectedCharacter: (id: CharacterId) => void
   setCurrentStep: (step: number) => void
@@ -22,6 +35,10 @@ interface GameState {
   restartGame: () => void
   incrementVictory: () => void
   resetAll: () => void
+
+  // MCQ actions
+  setMcqProgress: (id: string, patch: Partial<GameState['mcqProgress'][string]>) => void
+  resetMcq: (id: string) => void
 }
 
 export const useGameStore = create<GameState>()(
@@ -30,8 +47,9 @@ export const useGameStore = create<GameState>()(
       selectedCharacterId: null,
       currentStep: 0,
       maxSteps: gamePathData.maxSteps ?? 40,
-      isAdminMode: false,
-  victoryCount: 0,
+    isAdminMode: false,
+    victoryCount: 0,
+    mcqProgress: {},
 
       setSelectedCharacter: (id) => set({ selectedCharacterId: id }),
 
@@ -63,6 +81,43 @@ export const useGameStore = create<GameState>()(
         maxSteps: gamePathData.maxSteps ?? 40,
         isAdminMode: false,
         victoryCount: 0,
+        mcqProgress: {},
+      }),
+
+      setMcqProgress: (id, patch) => set((state) => {
+        const current = state.mcqProgress[id] ?? {
+          idx: 0,
+          selected: null,
+          correctCount: 0,
+          finished: false,
+          showFeedback: false,
+          lastChosenText: null,
+          lastChosenCorrect: false,
+          appliedBonus: null,
+          done: false,
+        }
+        return {
+          mcqProgress: {
+            ...state.mcqProgress,
+            [id]: { ...current, ...patch },
+          }
+        }
+      }),
+
+      resetMcq: (id) => set((state) => {
+        const next = { ...state.mcqProgress }
+        next[id] = {
+          idx: 0,
+          selected: null,
+          correctCount: 0,
+          finished: false,
+          showFeedback: false,
+          lastChosenText: null,
+          lastChosenCorrect: false,
+          appliedBonus: null,
+          done: false,
+        }
+        return { mcqProgress: next }
       }),
     }),
     {
@@ -73,6 +128,7 @@ export const useGameStore = create<GameState>()(
         maxSteps: state.maxSteps,
         isAdminMode: state.isAdminMode,
         victoryCount: state.victoryCount,
+        mcqProgress: state.mcqProgress,
       }),
     }
   )
