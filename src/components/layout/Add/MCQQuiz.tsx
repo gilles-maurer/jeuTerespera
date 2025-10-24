@@ -156,7 +156,7 @@ export function MCQQuiz({ quizIndex = 0 }: MCQQuizProps) {
             <BookOpen className="h-6 w-6" /> {quiz.title}
           </p>
           <p className="text-white/80 text-sm mt-1">
-            Question {Math.min(idx + 1, total)} / {total}
+            Question {Math.min(idx + 1, total)}/{total} | Score {correctCount}/{Math.min(idx + 1, total)}
           </p>
         </div>
       )}

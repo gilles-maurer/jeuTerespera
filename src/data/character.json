@@ -3,73 +3,73 @@
     {
       "id": "bibule",
       "name": "Bibule",
-      "description": "Un troubadour jongleur",
+      "description": "Troubadour et jongleur",
       "image": "bibule.png"
     },
     {
       "id": "abaiete",
       "name": "Abaiete",
-      "description": "Une troubadour chanteuse",
+      "description": "Troubadour et chanteuse",
       "image": "abaiete.png"
     },
     {
       "id": "apertis",
       "name": "Apertis",
-      "description": "",
+      "description": "Fidèle compagnon d'Amanevis",
       "image": "apertis.PNG"
     },
     {
       "id": "arondel",
       "name": "Arondel",
-      "description": "",
+      "description": "Fidèle page",
       "image": "arondel.png"
     },
     {
       "id": "mazerin",
       "name": "Mazerin",
-      "description": "",
+      "description": "...",
       "image": "mazerin.png"
     },
     {
       "id": "laignal",
       "name": "Laignal",
-      "description": "",
+      "description": "Menuisier acharné",
       "image": "laignal.PNG"
     },
     {
       "id": "esmarirran",
       "name": "Esmarriran",
-      "description": "",
+      "description": "Reine repentie",
       "image": "esmarirran.PNG"
     },
     {
       "id": "reheter",
       "name": "Reheter",
-      "description": "",
+      "description": "Garde dévouée d'Amanevis",
       "image": "reheter.PNG"
     },
     {
       "id": "amanevis",
       "name": "Amanevis",
-      "description": "",
+      "description": "Chevalier de Terespera",
       "image": "amanevis.png"
     }, 
     {
       "id": "kch",
       "name": "Kch",
-      "description": "",
+      "description": "Maître des cartes",
       "image": "kch.png"
     },
     {
       "id": "nono",
       "name": "Chef Nono",
-      "description": "",
+      "description": "La seule et l'unique",
       "image": "nono.png"
     },
     {
       "id": "lea",
-      "name": "Serigala",
-      "description": "",
+      "name": "Dame Serigala",
+      "description": "Maîtresse des cartes",
       "image": "lea.png"
     }
   
