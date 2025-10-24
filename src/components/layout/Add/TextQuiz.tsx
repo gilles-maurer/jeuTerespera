@@ -62,6 +62,7 @@ export function TextQuiz({ quizIndex = 0 }: TextQuizProps) {
   const [lives, setLives] = useState(3)
   const [hasWon, setHasWon] = useState(false)
   const [locked, setLocked] = useState<Record<number, boolean>>({})
+  const [currentBonus, setCurrentBonus] = useState(0);
 
   // When quizIndex changes, reload quiz and restore lives/won flags
   useEffect(() => {
@@ -90,21 +91,26 @@ export function TextQuiz({ quizIndex = 0 }: TextQuizProps) {
   const handleAnswerChange = (questionId: number, value: string) => {
     setAnswers((prev) => ({ ...prev, [questionId]: value }))
   }
+  
+  const computeBonus = (correct: number, tot: number, maxSteps: number) => {
+    if (correct <= 0 || tot <= 0) return 0
+    const scaled = Math.round((5 * correct) / tot)
+    return Math.max(1, Math.min(5, scaled))
+  }
 
   const checkAnswers = () => {
-    let ok = true
+    let count = quiz.questions.length;
     for (const q of quiz.questions) {
       const user = (answers[q.id] ?? '').trim().toLowerCase()
       const correctAns = (q.options.find((o) => o.correct)?.text ?? '').trim().toLowerCase()
       if (!user || user !== correctAns) {
-        ok = false
-        break
+        count = count-1
       }
     }
-    setIsCorrect(ok)
+    setIsCorrect(quiz.questions.length === count)
     setIsSubmitted(true)
 
-    if (ok) {
+    if (count === quiz.questions.length) {
       const bonus = quiz.bonusSteps ?? 0
       const newStep = Math.min(currentStepStore + bonus, maxSteps - 1)
       setCurrentStepStore(newStep)
@@ -112,6 +118,9 @@ export function TextQuiz({ quizIndex = 0 }: TextQuizProps) {
       setHasWon(true)
       localStorage.setItem(`quiz_${quiz.id}_won`, 'true')
     } else {
+      const maxBonus = quiz.bonusSteps ?? 0
+      const bonus = computeBonus(count, quiz.questions.length, maxBonus)
+      setCurrentBonus(bonus);
       const newLives = lives - 1
       setLives(newLives)
       localStorage.setItem(`quiz_${quiz.id}_lives`, String(newLives))
@@ -233,7 +242,7 @@ export function TextQuiz({ quizIndex = 0 }: TextQuizProps) {
           {hasWon && (
             <div className="bg-green-100 text-green-800 p-4 rounded-lg text-center font-bold">
               <CheckCircle className="h-8 w-8 mx-auto mb-2" />
-              <p>✅ Quiz déjà réussi !</p>
+              <p>✅ Quiz réussi !</p>
               {quiz.bonusSteps ? (
                 <p className="text-sm mt-1">+{quiz.bonusSteps} cases gagnées</p>
               ) : null}
@@ -246,6 +255,7 @@ export function TextQuiz({ quizIndex = 0 }: TextQuizProps) {
               <XCircle className="h-8 w-8 mx-auto mb-2" />
               <p>Plus de vies ! 💔</p>
               <p className="text-sm mt-1">Le quiz est terminé</p>
+              <p className="text-sm mt-1">Bonus: {currentBonus} cases bonus !</p>
             </div>
           )}
 
