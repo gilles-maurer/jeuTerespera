@@ -94,8 +94,8 @@ export function TextQuiz({ quizIndex = 0 }: TextQuizProps) {
   
   const computeBonus = (correct: number, tot: number, maxSteps: number) => {
     if (correct <= 0 || tot <= 0) return 0
-    const scaled = Math.round((5 * correct) / tot)
-    return Math.max(1, Math.min(5, scaled))
+    const scaled = Math.round((maxSteps * correct) / tot)
+    return Math.max(1, Math.min(maxSteps, scaled))
   }
 
   const checkAnswers = () => {
