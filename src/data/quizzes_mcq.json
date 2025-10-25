@@ -54,8 +54,8 @@
         "id": 5,
         "prompt": "Combien y avait-il de pancartes pour le sketch d'intro ?",
         "options": [
-          { "text": "12", "correct": false },
-          { "text": "10", "correct": true },
+          { "text": "11", "correct": false },
+          { "text": "13", "correct": true },
           { "text": "8", "correct": false }
         ]
       },
