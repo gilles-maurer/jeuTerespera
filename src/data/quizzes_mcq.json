@@ -3,7 +3,7 @@
     "id": "quiz88",
     "mode": "mcq",
     "title": "Le quiz du rallye",
-    "maxBonus": 5,
+    "maxBonus": 10,
     "questions": [
       {
         "id": 0,

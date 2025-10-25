@@ -1,5 +1,5 @@
 {
-  "maxSteps": 50,
+  "maxSteps": 70,
   "currentStep": 0,
   "pathConfig": {
     "nodeSize": 50,
