@@ -123,6 +123,15 @@
       },
       {
         "id": 13,
+        "prompt": "Combien de litre de Monster ont été consommé par les troubadours ?",
+        "options": [
+          { "text": "5L", "correct": true },
+          { "text": "3L", "correct": false },
+          { "text": "8L", "correct": false }
+        ]
+      },      
+      {
+        "id": 14,
         "prompt": "Quel membre manquait à Esmarinaz ?",
         "options": [
           { "text": "Main gauche", "correct": true },
